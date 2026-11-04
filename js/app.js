@@ -94,7 +94,8 @@ var S = {
 var chartBar = null,
     chartTrend = null,
   chartInOut = null;
-var JOB_PAL = ['#1a56db', '#0e9f6e', '#d97706', '#e3342f', '#7c3aed', '#0891b2', '#be185d', '#65a30d'];
+/* 그래프에서 직업을 구분하는 색. 앞 세 가지가 돈워리 기본색입니다. */
+var JOB_PAL = ['#fbbf24', '#1b2a4a', '#1e4d3a', '#2563eb', '#e11d48', '#0d9488', '#7c3aed', '#f97316'];
 var fmt = function fmt(n) {
   return Number(n).toLocaleString('ko-KR') + '원';
 };
@@ -4329,13 +4330,17 @@ function renderTreasury() {
     if (sg) {
       sg.innerHTML =
         '<div class="stat"><div class="stat-label">' + S.month + '월 수입</div>'
-        + '<div class="stat-value green" style="font-size:19px">+' + fmt(st.monthIncome) + '</div></div>'
+        + '<div class="stat-value green" style="font-size:19px">+' + fmt(st.monthIncome) + '</div>'
+        + '<span class="stat-note">세금과 물품 판매</span></div>'
         + '<div class="stat"><div class="stat-label">' + S.month + '월 지출</div>'
-        + '<div class="stat-value red" style="font-size:19px">-' + fmt(st.monthExpense) + '</div></div>'
+        + '<div class="stat-value red" style="font-size:19px">-' + fmt(st.monthExpense) + '</div>'
+        + '<span class="stat-note">급여와 학급 행사</span></div>'
         + '<div class="stat"><div class="stat-label">누적 수입</div>'
-        + '<div class="stat-value" style="font-size:19px;color:var(--c2)">' + fmt(st.income) + '</div></div>'
+        + '<div class="stat-value navy" style="font-size:19px">' + fmt(st.income) + '</div>'
+        + '<span class="stat-note">학기 전체</span></div>'
         + '<div class="stat"><div class="stat-label">누적 지출</div>'
-        + '<div class="stat-value" style="font-size:19px;color:var(--cd)">' + fmt(st.expense) + '</div></div>';
+        + '<div class="stat-value navy" style="font-size:19px">' + fmt(st.expense) + '</div>'
+        + '<span class="stat-note">학기 전체</span></div>';
     }
     return call('getTreasuryLedger', 300);
   }).then(function (rows) {

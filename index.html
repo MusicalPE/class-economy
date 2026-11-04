@@ -145,7 +145,7 @@
     <div class="card purple-card" id="st-shop-card" style="display:none">
       <div class="card-title"><i class="ti ti-shopping-cart"></i>내 상점 <span class="badge badge-purple" id="st-shop-role"></span></div>
 
-      <div style="background:#faf5ff;border:1px solid var(--cp);border-radius:8px;padding:14px;margin-bottom:14px">
+      <div class="note">
         <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:#5b21b6">판매 처리</div>
         <div class="form-grid">
           <div class="form-row-s"><label class="form-label-s">구매 학생</label><select id="st-sk-buyer"></select></div>
@@ -177,10 +177,10 @@
     </div>
 
     <!-- ★ 은행 업무 (권한 있을 때만 표시) -->
-    <div class="card" id="st-bank-card" style="display:none;border:1.5px solid #d97706">
+    <div class="card" id="st-bank-card" style="display:none;border-color:#fde68a">
       <div class="card-title"><i class="ti ti-building-bank"></i>은행 창구 <span class="badge badge-yellow">은행직원</span></div>
 
-      <div style="background:#fffbeb;border:1px solid #f59e0b;border-radius:8px;padding:14px;margin-bottom:14px">
+      <div class="note gold">
         <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:#92400e">적금 개설 신청</div>
         <div class="form-grid">
           <div class="form-row-s"><label class="form-label-s">예금주</label><select id="st-bk-depositor" onchange="stBkUpdateBal()"></select></div>
@@ -215,10 +215,10 @@
           </div>
         </div>
 
-        <div style="background:#fef9c3;border:1px solid #f59e0b;border-radius:8px;padding:10px;font-size:12px;color:#92400e;margin:12px 0">
+        <div class="note gold" style="margin:12px 0">
           <i class="ti ti-info-circle"></i> 신청 후 <strong>선생님 승인</strong>이 있어야 적금이 시작됩니다.
         </div>
-        <button class="btn" style="background:#d97706;color:#fff;border-color:#d97706" onclick="stBkCreate()"><i class="ti ti-send"></i> 적금 신청</button>
+        <button class="btn btn-gold" onclick="stBkCreate()"><i class="ti ti-send"></i> 적금 신청</button>
         <div class="msg-box" id="st-bk-msg"></div>
       </div>
 
@@ -227,7 +227,7 @@
     </div>
 
     <!-- ★ 건의사항 -->
-    <div class="card" style="border:1.5px solid var(--c1)">
+    <div class="card" style="border-color:#c7d2e4">
       <div class="card-title"><i class="ti ti-send"></i>선생님께 건의하기</div>
       <p style="font-size:12px;color:var(--muted);margin-bottom:14px">
         학급을 더 좋게 만들 아이디어가 있으면 선생님께 보내주세요. 하루 3건까지 보낼 수 있어요.
@@ -361,7 +361,7 @@
         <button class="exit-btn" onclick="exitSkMode()">모드 종료</button>
       </div>
 
-      <div class="sk-banner" id="bank-banner" style="background:linear-gradient(135deg,#d97706,#f59e0b)">
+      <div class="sk-banner" id="bank-banner" style="background:linear-gradient(135deg,var(--board),#2d7a5c)">
         <i class="ti ti-building-bank"></i>
         <div class="sk-banner-text"><strong id="bank-banner-name"></strong><span id="bank-banner-role"></span></div>
         <button class="exit-btn" onclick="exitBankMode()">모드 종료</button>
@@ -539,18 +539,18 @@
       <div class="page" id="page-shopperms">
         <div class="page-title"><i class="ti ti-shield-check"></i>권한 관리</div>
         <div class="acc-head" id="acc-head-shop" onclick="toggleSection('shop')">
-          <i class="ti ti-shopping-cart" style="color:var(--cp)"></i>
-          <span style="color:var(--cp)">상점 권한</span>
+          <i class="ti ti-shopping-cart" style="color:var(--board)"></i>
+          <span style="color:var(--board)">상점 권한</span>
           <i class="ti ti-chevron-down acc-arrow" id="acc-arrow-shop"></i>
         </div>
         <div class="acc-body" id="acc-body-shop">
-        <div class="card" style="border-color:var(--cp)">
+        <div class="card" style="border-color:#a7f3d0">
           <div class="card-title"><i class="ti ti-info-circle"></i>권한 종류</div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;font-size:12px">
-            <div style="padding:8px;border-radius:7px;background:#dbeafe"><strong style="color:#1e40af">판매</strong><br>구입 처리만 가능</div>
-            <div style="padding:8px;border-radius:7px;background:#fef9c3"><strong style="color:#854d0e">가격변경</strong><br>판매+가격수정</div>
-            <div style="padding:8px;border-radius:7px;background:#dcfce7"><strong style="color:#166534">재고관리</strong><br>판매+재고수정</div>
-            <div style="padding:8px;border-radius:7px;background:var(--cpl)"><strong style="color:#5b21b6">전체관리</strong><br>추가/수정/삭제</div>
+            <div style="padding:10px;border-radius:10px;background:#dbeafe"><strong style="color:#1e40af">판매</strong><br>구입 처리만 가능</div>
+            <div style="padding:10px;border-radius:10px;background:var(--gold-l)"><strong style="color:#854d0e">가격변경</strong><br>판매+가격수정</div>
+            <div style="padding:10px;border-radius:10px;background:var(--c2l)"><strong style="color:#166534">재고관리</strong><br>판매+재고수정</div>
+            <div style="padding:10px;border-radius:10px;background:var(--board-l)"><strong style="color:#5b21b6">전체관리</strong><br>추가/수정/삭제</div>
           </div>
         </div>
         <div class="card">
@@ -564,23 +564,23 @@
         </div>
 
         <div class="acc-head" id="acc-head-bank" onclick="toggleSection('bank')">
-          <i class="ti ti-building-bank" style="color:#d97706"></i>
-          <span style="color:#d97706">은행 권한</span>
+          <i class="ti ti-building-bank" style="color:var(--gold-d)"></i>
+          <span>은행 권한</span>
           <i class="ti ti-chevron-down acc-arrow" id="acc-arrow-bank"></i>
         </div>
         <div class="acc-body" id="acc-body-bank">
 
-        <div class="card" style="border-color:#d97706">
+        <div class="card" style="border-color:#fde68a">
           <div class="card-title"><i class="ti ti-info-circle"></i>역할 안내</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px">
-            <div style="padding:10px;border-radius:8px;background:#fef3c7"><strong style="color:#92400e">🏦 은행직원</strong><br>적금 개설, 조회 가능</div>
-            <div style="padding:10px;border-radius:8px;background:#fef9c3"><strong style="color:#713f12">👑 은행장</strong><br>은행직원 권한 + 기본 이자율 설정</div>
+            <div style="padding:11px;border-radius:10px;background:var(--gold-l)"><strong style="color:#92400e">🏦 은행직원</strong><br>적금 개설, 조회 가능</div>
+            <div style="padding:11px;border-radius:10px;background:var(--gold-l)"><strong style="color:#713f12">👑 은행장</strong><br>은행직원 권한 + 기본 이자율 설정</div>
           </div>
         </div>
         <div class="card">
           <div class="toolbar">
             <div class="card-title" style="margin:0"><i class="ti ti-list-check"></i>은행 권한 목록</div>
-            <div class="toolbar-right"><button class="btn btn-sm" style="background:#d97706;color:#fff;border-color:#d97706" onclick="openBankPermModal(-1)"><i class="ti ti-plus"></i> 권한 추가</button></div>
+            <div class="toolbar-right"><button class="btn btn-sm btn-gold" onclick="openBankPermModal(-1)"><i class="ti ti-plus"></i> 권한 추가</button></div>
           </div>
           <div class="tbl-wrap"><table class="tbl">
             <thead><tr><th>직업명</th><th>역할</th><th>배정 학생</th><th>관리</th></tr></thead>
@@ -595,7 +595,7 @@
             <div class="form-row-s"><label class="form-label-s">30일 기본 이자율 (%)</label><input id="bank-rate30" type="number" min="0" max="50" step="0.1" placeholder="예) 10"></div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn" style="background:#d97706;color:#fff;border-color:#d97706" onclick="doSaveBankSettings()"><i class="ti ti-device-floppy"></i> 저장</button>
+            <button class="btn btn-gold" onclick="doSaveBankSettings()"><i class="ti ti-device-floppy"></i> 저장</button>
             <button class="btn" onclick="doInitTrigger()"><i class="ti ti-clock"></i> 자동 해약 트리거 설정</button>
             <button class="btn btn-sm btn-green" onclick="doProcessMature()"><i class="ti ti-refresh"></i> 지금 만기 처리</button>
           </div>
@@ -633,17 +633,17 @@
       <div class="page" id="page-treasury">
         <div class="page-title"><i class="ti ti-building-bank"></i>학급 금고</div>
 
-        <div class="card" style="background:linear-gradient(135deg,var(--c2) 0%,#34d399 100%);color:#fff;border:none">
-          <div style="font-size:13px;opacity:.85;margin-bottom:4px">현재 금고 잔액</div>
-          <div style="font-size:38px;font-weight:800;letter-spacing:-1px" id="tre-balance">0원</div>
-          <div style="font-size:12px;opacity:.8;margin-top:6px">
+        <div class="card hero">
+          <div class="hero-label">현재 금고 잔액</div>
+          <div class="hero-value" id="tre-balance">0원</div>
+          <div class="hero-note">
             세금과 물품 판매 대금이 이곳에 모입니다
           </div>
         </div>
 
         <div class="stat-grid" id="tre-stats"></div>
 
-        <div class="card" style="border:1.5px solid var(--c1)">
+        <div class="card" style="border-color:#c7d2e4">
           <div class="card-title"><i class="ti ti-cash"></i>학급 운영비 지원</div>
           <p style="font-size:12px;color:var(--muted);margin-bottom:14px">
             학교에서 배정된 학급 운영비를 금고에 넣습니다. 학기 초에 한 번 넣어두면
@@ -733,7 +733,7 @@
       <div class="page" id="page-reset">
         <div class="page-title"><i class="ti ti-trash"></i>초기화</div>
 
-        <div class="card" style="border:1.5px solid var(--cd);background:#fff5f5">
+        <div class="card" style="border-color:#fecdd3;background:#fff5f5">
           <div class="card-title"><i class="ti ti-info-circle"></i>주의</div>
           <p style="font-size:13px;color:#9b1c1c;line-height:1.7;margin:0">
             초기화한 데이터는 <strong>되돌릴 수 없습니다.</strong><br>
@@ -788,7 +788,7 @@
             <button class="btn btn-danger" onclick="doResetClass('transactions')"><i class="ti ti-refresh"></i> 거래 기록 초기화</button>
           </div>
 
-          <div style="border:1.5px solid var(--cd);border-radius:8px;padding:14px;background:#fff5f5">
+          <div class="note danger">
             <div style="font-weight:600;font-size:13px;margin-bottom:6px;color:#9b1c1c">전체 초기화 <span class="badge badge-red">위험</span></div>
             <p style="font-size:12px;color:#9b1c1c;margin-bottom:10px;line-height:1.6">
               거래내역·적금에 더해 <strong>학생 명단, 직업 배정, 비밀번호까지</strong> 모두 지웁니다.<br>
@@ -844,7 +844,7 @@
         <div class="stat-grid" id="savings-stats"></div>
 
         <!-- 교사 직접 적금 개설 -->
-        <div class="card" style="border:1.5px solid #d97706">
+        <div class="card" style="border-color:#fde68a">
           <div class="card-title"><i class="ti ti-plus"></i>적금 개설 (교사)</div>
           <div class="form-grid">
             <div class="form-row-s"><label class="form-label-s">예금주</label><select id="t-depositor" onchange="tUpdateDepositorBal()"></select></div>
@@ -879,11 +879,11 @@
               </div>
             </div>
           </div>
-          <button class="btn" style="background:#d97706;color:#fff;border-color:#d97706" onclick="doTeacherCreateSaving()"><i class="ti ti-coin"></i> 즉시 개설</button>
+          <button class="btn btn-gold" onclick="doTeacherCreateSaving()"><i class="ti ti-coin"></i> 즉시 개설</button>
           <p style="font-size:11px;color:var(--muted);margin-top:6px"><i class="ti ti-info-circle"></i> 교사가 직접 개설한 적금은 즉시 진행됩니다. (잔액 즉시 차감)</p>
           <div class="msg-box" id="t-saving-msg"></div>
         </div>
-        <div class="card" style="border:1.5px solid var(--cy)">
+        <div class="card" style="border-color:#fde68a">
           <div class="card-title"><i class="ti ti-clock"></i>
             승인 대기 <span id="savings-pending-badge" class="badge badge-yellow" style="display:none"></span>
           </div>
@@ -919,7 +919,7 @@
       <!-- ★ 은행 모드 -->
       <div class="page" id="page-bank-mode">
         <div class="page-title"><i class="ti ti-building-bank"></i><span id="bank-mode-title">은행 창구</span></div>
-        <div class="card" style="border:1.5px solid #d97706">
+        <div class="card" style="border-color:#fde68a">
           <div class="card-title"><i class="ti ti-coin"></i>적금 개설</div>
           <div class="form-grid">
             <div class="form-row-s"><label class="form-label-s">예금주 (학생 선택)</label><select id="bank-depositor" onchange="updateBankDepositorBalance()"></select></div>
@@ -955,10 +955,10 @@
           </div>
 
           </div>
-          <div style="background:#fef9c3;border:1px solid #f59e0b;border-radius:8px;padding:10px;font-size:12px;color:#92400e;margin-bottom:12px">
+          <div class="note gold">
             <i class="ti ti-info-circle"></i> 신청 후 <strong>교사 승인 시</strong> 잔액이 차감되고 적금이 시작됩니다. 만기일에 원리금이 자동 지급됩니다.
           </div>
-          <button class="btn" style="background:#d97706;color:#fff;border-color:#d97706" onclick="doCreateSaving()"><i class="ti ti-plus"></i> 적금 개설</button>
+          <button class="btn btn-gold" onclick="doCreateSaving()"><i class="ti ti-plus"></i> 적금 개설</button>
           <div class="msg-box" id="bank-create-msg"></div>
         </div>
         <div class="card">
@@ -977,7 +977,7 @@
         <!-- 미리보기 -->
         <div class="card">
           <div class="card-title"><i class="ti ti-eye"></i>미리보기</div>
-          <div id="preview-bg" style="display:flex;justify-content:center;padding:24px 12px;background:linear-gradient(135deg,#1340a8 0%,#1a56db 55%,#3b82f6 100%);border-radius:10px">
+          <div id="preview-bg" style="display:flex;justify-content:center;padding:24px 12px;background:linear-gradient(135deg,#15283F 0%,#1b2a4a 55%,#1e4d3a 100%);border-radius:10px">
             <div style="width:100%;max-width:320px">
               <div style="text-align:center;color:#fff;margin-bottom:18px">
                 <div id="preview-logo-wrap" style="margin-bottom:6px"><i class="ti ti-building-bank" style="font-size:40px;opacity:.9"></i></div>
@@ -1290,7 +1290,7 @@
 </div></div>
 
 <div class="modal-bg" id="modal-perm"><div class="modal">
-  <div class="modal-title"><i class="ti ti-shield-check" style="color:var(--cp)"></i><span id="perm-modal-title">권한 추가</span></div>
+  <div class="modal-title"><i class="ti ti-shield-check" style="color:var(--board)"></i><span id="perm-modal-title">권한 추가</span></div>
   <div class="form-row-s"><label class="form-label-s">직업</label><select id="perm-job"></select></div>
   <div class="form-row-s"><label class="form-label-s">카테고리</label>
     <input id="perm-cat" type="text" placeholder="전체" list="cat-list2"><datalist id="cat-list2"><option value="전체"><option value="간식"><option value="특권"><option value="문구"></datalist></div>
@@ -1302,23 +1302,23 @@
 
 
 <div class="modal-bg" id="modal-bankperm"><div class="modal">
-  <div class="modal-title"><i class="ti ti-building-bank" style="color:#d97706"></i><span id="bankperm-modal-title">은행 권한 추가</span></div>
+  <div class="modal-title"><i class="ti ti-building-bank" style="color:var(--gold-d)"></i><span id="bankperm-modal-title">은행 권한 추가</span></div>
   <div class="form-row-s"><label class="form-label-s">직업</label><select id="bankperm-job"></select></div>
   <div class="form-row-s"><label class="form-label-s">역할</label>
     <select id="bankperm-role"><option value="은행직원">은행직원</option><option value="은행장">은행장</option></select></div>
   <input type="hidden" id="bankperm-idx" value="-1">
-  <div class="modal-footer"><button class="btn" onclick="closeModal('modal-bankperm')">취소</button><button class="btn" style="background:#d97706;color:#fff;border-color:#d97706" onclick="doSaveBankPerm()">저장</button></div>
+  <div class="modal-footer"><button class="btn" onclick="closeModal('modal-bankperm')">취소</button><button class="btn btn-gold" onclick="doSaveBankPerm()">저장</button></div>
 </div></div>
 
 <div class="modal-bg" id="modal-bank-login"><div class="modal">
-  <div class="modal-title"><i class="ti ti-building-bank" style="color:#d97706"></i>은행 모드 진입</div>
+  <div class="modal-title"><i class="ti ti-building-bank" style="color:var(--gold-d)"></i>은행 모드 진입</div>
   <p style="font-size:13px;color:var(--muted);margin-bottom:14px">은행 권한을 가진 학생의 출석번호를 입력하세요.</p>
   <div class="form-row-s"><label class="form-label-s">출석 번호</label><input id="bank-login-num" type="number" onkeydown="if(event.key==='Enter')doBankLogin()"></div>
   <div class="msg-box" id="bank-login-msg"></div>
-  <div class="modal-footer"><button class="btn" onclick="closeModal('modal-bank-login')">취소</button><button class="btn" style="background:#d97706;color:#fff;border-color:#d97706" onclick="doBankLogin()">입장</button></div>
+  <div class="modal-footer"><button class="btn" onclick="closeModal('modal-bank-login')">취소</button><button class="btn btn-gold" onclick="doBankLogin()">입장</button></div>
 </div></div>
 <div class="modal-bg" id="modal-sk-login"><div class="modal">
-  <div class="modal-title"><i class="ti ti-shopping-cart" style="color:var(--cp)"></i>상점지기 모드 진입</div>
+  <div class="modal-title"><i class="ti ti-shopping-cart" style="color:var(--board)"></i>상점지기 모드 진입</div>
   <p style="font-size:13px;color:var(--muted);margin-bottom:14px">상점 권한을 가진 학생의 출석번호를 입력하세요.</p>
   <div class="form-row-s"><label class="form-label-s">출석 번호</label><input id="sk-login-num" type="number" onkeydown="if(event.key==='Enter')doSkLogin()"></div>
   <div class="msg-box" id="sk-login-msg"></div>

@@ -241,6 +241,33 @@ body{font-family:'Noto Sans KR',sans-serif;color:var(--text);font-size:14px;
 .board-banner .act:hover{background:#fcd34d}
 
 /* ══════════════════════════════════════════════════════════
+   큰 수치 머리글 — 학급 금고처럼 금액 하나가 주인공인 자리
+   ══════════════════════════════════════════════════════════ */
+.hero,.card.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--board) 100%);
+  color:#fff;border:none;position:relative;overflow:hidden;
+  box-shadow:0 8px 24px rgba(27,42,74,.24)}
+.hero::after{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;
+  border-radius:50%;background:rgba(251,191,36,.16);filter:blur(34px);pointer-events:none}
+.hero-label{font-size:12.5px;opacity:.78;font-weight:600;position:relative;z-index:1}
+.hero-value{font-size:38px;font-weight:800;letter-spacing:-1.2px;color:var(--gold);
+  margin-top:5px;position:relative;z-index:1}
+.hero-note{font-size:12px;opacity:.74;margin-top:9px;position:relative;z-index:1;font-weight:500}
+
+/* ══════════════════════════════════════════════════════════
+   안내 상자 — 페이지마다 다른 색을 쓰지 않고 이 셋만 씁니다
+   ══════════════════════════════════════════════════════════ */
+.note{background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:14px 16px;margin-bottom:14px;font-size:12.5px;color:#475569;line-height:1.75;
+  font-weight:500}
+.note strong{color:var(--text);font-weight:800}
+.note.gold{background:var(--gold-l);border-color:#fde68a;color:#854d0e}
+.note.gold strong{color:#78350f}
+.note.board{background:var(--board-l);border-color:#a7f3d0;color:#065f46}
+.note.board strong{color:#064e3b}
+.note.danger{background:#fff5f5;border-color:#fecdd3;color:#9f1239}
+.note.danger strong{color:#881337}
+
+/* ══════════════════════════════════════════════════════════
    카드 · 지표 타일
    ══════════════════════════════════════════════════════════ */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
@@ -297,7 +324,9 @@ body{font-family:'Noto Sans KR',sans-serif;color:var(--text);font-size:14px;
 .btn-gold{background:var(--gold);color:var(--gold-ink);border-color:var(--gold);font-weight:800}
 .btn-gold:hover{background:#fcd34d}
 .btn-danger{background:var(--cd);color:#fff;border-color:var(--cd)}.btn-danger:hover{opacity:.88}
-.btn-purple{background:var(--cp);color:#fff;border-color:var(--cp)}.btn-purple:hover{opacity:.88}
+/* 상점 관련 버튼 — 칠판 초록으로 통일 */
+.btn-purple{background:var(--board);color:#fff;border-color:var(--board)}
+.btn-purple:hover{background:#2d7a5c}
 .btn-green{background:var(--c2);color:#fff;border-color:var(--c2)}.btn-green:hover{opacity:.88}
 .btn-sm{padding:5px 10px;font-size:11px;border-radius:9px}
 .row-btns{display:flex;gap:5px}
