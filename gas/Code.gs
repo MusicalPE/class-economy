@@ -20,7 +20,7 @@ const SHEET_NAMES = {
   SETTINGS   : '설정'
 };
 
-const APP_VERSION = '2.0.0';
+const APP_VERSION = '2.1.0';
 
 // 화면이 올라가 있는 주소 (GitHub Pages)
 const APP_URL = 'https://musicalpe.github.io/class-economy/';
