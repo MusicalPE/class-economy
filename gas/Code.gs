@@ -32,12 +32,68 @@ const APP_URL = 'https://musicalpe.github.io/class-economy/';
    ────────────────────────────────────────────────────────────── */
 function doGet(e, selfUrl) {
   const target = APP_URL + '?app=' + encodeURIComponent(selfUrl || '');
+  const t = JSON.stringify(target);
+
+  // 로고 — 칠판 안의 웃는 동전
+  const mark =
+    '<svg viewBox="36 86 440 342" xmlns="http://www.w3.org/2000/svg" width="110">' +
+    '<rect x="46" y="96" width="420" height="288" rx="22" fill="#2F5D4E" stroke="#E9C27E" stroke-width="20"/>' +
+    '<rect x="112" y="392" width="288" height="26" rx="13" fill="#E9C27E"/>' +
+    '<rect x="146" y="398" width="48" height="14" rx="7" fill="#FFFFFF"/>' +
+    '<circle cx="256" cy="240" r="100" fill="#F6C457"/>' +
+    '<circle cx="256" cy="240" r="100" fill="none" stroke="#D08C1C" stroke-width="16"/>' +
+    '<circle cx="256" cy="240" r="75" fill="none" stroke="#D08C1C" stroke-width="9" opacity=".45"/>' +
+    '<circle cx="227" cy="222" r="11" fill="#1B3B30"/>' +
+    '<circle cx="285" cy="222" r="11" fill="#1B3B30"/>' +
+    '<path d="M220 266c10 23 27 35 36 35s26-12 36-35" fill="none" stroke="#1B3B30"' +
+    ' stroke-width="15" stroke-linecap="round"/></svg>';
+
+  /* 브라우저는 "누르지 않은 자동 이동"을 막는 경우가 많습니다.
+     그래서 세 단계로 시도합니다.
+       1) 바깥 창을 바로 넘긴다 (막히면 조용히 실패)
+       2) 1.4초 뒤에도 그대로면 이 틀 안에서라도 연다
+       3) 그 사이 화면에는 큰 단추를 보여 준다 (누르면 반드시 열린다) */
+  const js =
+    'var T=' + t + ';' +
+    'function go(){try{if(window.top!==window.self){window.top.location.replace(T);return true;}}catch(e){}' +
+    'return false;}' +
+    'go();' +
+    'setTimeout(function(){try{window.location.replace(T);}catch(e){}},1400);';
+
   const html =
-    '<!DOCTYPE html><meta charset="utf-8"><title>돈워리!</title>' +
-    '<body style="font-family:sans-serif;padding:28px;color:#374151">' +
-    '<p>화면을 여는 중입니다...</p>' +
-    '<p><a href="' + target + '" target="_top">열리지 않으면 여기를 눌러 주세요</a></p>' +
-    '<script>window.top.location.href=' + JSON.stringify(target) + ';<\/script>';
+    '<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>돈워리!</title>' +
+    '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">' +
+    '<style>' +
+    '*{margin:0;padding:0;box-sizing:border-box}' +
+    'body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;' +
+    "font-family:'Noto Sans KR',sans-serif;" +
+    'background:radial-gradient(760px 420px at 50% 0%,rgba(251,191,36,.16),transparent 60%),' +
+    'linear-gradient(135deg,#15283F 0%,#1b2a4a 52%,#1e4d3a 100%);color:#fff;text-align:center}' +
+    '.box{max-width:400px}' +
+    'h1{font-size:27px;font-weight:800;letter-spacing:-.6px;margin-top:16px}' +
+    'h1 .en{font-size:14px;color:#fbbf24;margin-left:8px;vertical-align:3px}' +
+    'p{font-size:13.5px;opacity:.76;margin-top:9px;line-height:1.7;font-weight:500}' +
+    '.go{display:inline-flex;align-items:center;justify-content:center;gap:8px;' +
+    'margin-top:26px;padding:15px 30px;border-radius:13px;text-decoration:none;' +
+    'background:linear-gradient(90deg,#fbbf24,#fcd34d);color:#422006;' +
+    'font-size:15.5px;font-weight:800;box-shadow:0 8px 22px rgba(245,158,11,.34)}' +
+    '.dots{margin-top:20px;display:flex;gap:7px;justify-content:center}' +
+    '.dots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.35);' +
+    'animation:b 1.1s infinite}' +
+    '.dots i:nth-child(2){animation-delay:.18s}.dots i:nth-child(3){animation-delay:.36s}' +
+    '@keyframes b{0%,100%{opacity:.3}50%{opacity:1}}' +
+    '.tip{font-size:11.5px;opacity:.5;margin-top:22px}' +
+    '</style></head><body><div class="box">' +
+    mark +
+    '<h1>돈워리!<span class="en">Don\'t Worry</span></h1>' +
+    '<p>우리 반 경제 화면으로 이동합니다.<br>잠시 기다리거나 아래 단추를 눌러 주세요.</p>' +
+    '<div class="dots"><i></i><i></i><i></i></div>' +
+    '<a class="go" href="' + target + '" target="_top">돈워리! 열기</a>' +
+    '<div class="tip">이 주소를 즐겨찾기에 넣어 두면 다음부터 편합니다</div>' +
+    '</div><script>' + js + '<\/script></body></html>';
+
   return HtmlService.createHtmlOutput(html)
     .setTitle('돈워리!')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
