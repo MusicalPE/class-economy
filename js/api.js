@@ -161,6 +161,49 @@
 
   window.CE_showSetup = showSetup;
 
+  /* ── 홈 화면에 추가해 앱처럼 쓰기 ──────────────────────────── */
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js', { scope: './' })['catch'](function () {});
+    });
+  }
+
+  // 안드로이드·크롬에서 설치할 수 있을 때만 버튼을 띄웁니다.
+  var deferred = null;
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferred = e;
+    showInstallChip();
+  });
+  window.addEventListener('appinstalled', function () {
+    deferred = null;
+    var c = document.getElementById('ce-install');
+    if (c) c.remove();
+  });
+
+  function showInstallChip() {
+    if (document.getElementById('ce-install')) return;
+    var b = document.createElement('button');
+    b.id = 'ce-install';
+    b.type = 'button';
+    b.innerHTML = '<span>앱으로 설치</span>';
+    b.setAttribute('style',
+      'position:fixed;left:18px;bottom:18px;z-index:9100;border:0;cursor:pointer;' +
+      'background:#fbbf24;color:#422006;font-family:inherit;font-size:12.5px;' +
+      'font-weight:800;padding:10px 16px;border-radius:11px;' +
+      'box-shadow:0 6px 18px rgba(245,158,11,.35)');
+    b.onclick = function () {
+      if (!deferred) { b.remove(); return; }
+      deferred.prompt();
+      deferred.userChoice['finally'](function () {
+        deferred = null;
+        b.remove();
+      });
+    };
+    document.body.appendChild(b);
+  }
+
   /* 주소가 없으면 화면이 뜨기 전에 먼저 막는다 */
   if (!getUrl()) {
     if (document.readyState === 'loading') {
