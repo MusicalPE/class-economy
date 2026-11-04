@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512"
+     role="img" aria-label="돈워리!">
+  <title>돈워리!</title>
+  <rect width="512" height="512" rx="116" fill="#1F3A5F"/>
+  <rect x="66" y="104" width="380" height="272" rx="20" fill="#2F5D4E"
+        stroke="#E9C27E" stroke-width="18"/>
+  <rect x="120" y="384" width="272" height="24" rx="12" fill="#E9C27E"/>
+  <rect x="150" y="389" width="46" height="14" rx="7" fill="#FFFFFF"/>
+  <circle cx="256" cy="238" r="94" fill="#F6C457"/>
+  <circle cx="256" cy="238" r="94" fill="none" stroke="#D08C1C" stroke-width="15"/>
+  <circle cx="256" cy="238" r="71" fill="none" stroke="#D08C1C" stroke-width="9" opacity=".45"/>
+  <circle cx="229" cy="221" r="10" fill="#1B3B30"/>
+  <circle cx="283" cy="221" r="10" fill="#1B3B30"/>
+  <path d="M222 263c9 21 25 32 34 32s25-11 34-32" fill="none" stroke="#1B3B30"
+        stroke-width="14" stroke-linecap="round"/>
+</svg>

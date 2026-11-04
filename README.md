@@ -1,6 +1,8 @@
-# 교실 경제 시스템
+# 돈워리!
 
 초등 교실에서 직업·급여·세금·상점·은행·학급 금고를 운영하는 웹 프로그램입니다.
+
+돈 걱정 말고 돈을 배우자는 뜻으로 지은 이름입니다.
 
 Made by 음악적체육인
 
@@ -21,6 +23,8 @@ index.html          화면 틀
 css/style.css       모양
 js/api.js           서버 연결 (fetch)
 js/app.js           화면 동작
+assets/             아이콘 (icon.svg 가 원본)
+manifest.webmanifest
 gas/Code.gs         라이브러리 원본 (제작자용)
 gas/appsscript.json
 shell/Shell.gs      각 학교 시트에 붙는 껍데기
