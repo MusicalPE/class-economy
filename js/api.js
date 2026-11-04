@@ -182,17 +182,37 @@
     if (c) c.remove();
   });
 
+  /* 지금 보이는 화면의 시계를 찾아 그 옆자리를 돌려줍니다.
+     로그인 화면에는 시계가 없어서 그때는 아래쪽에 띄웁니다. */
+  function hostForChip() {
+    var ids = ['topbar-clock', 'topbar-clock-student'];
+    for (var i = 0; i < ids.length; i++) {
+      var el = document.getElementById(ids[i]);
+      if (el && el.offsetParent !== null) return el.parentNode;
+    }
+    return null;
+  }
+
+  function placeChip() {
+    var b = document.getElementById('ce-install');
+    if (!b) return;
+    var host = hostForChip();
+    if (host) {
+      if (b.parentNode !== host) host.appendChild(b);
+      b.className = 'ce-install-inline';
+    } else {
+      if (b.parentNode !== document.body) document.body.appendChild(b);
+      b.className = 'ce-install-float';
+    }
+  }
+
   function showInstallChip() {
     if (document.getElementById('ce-install')) return;
     var b = document.createElement('button');
     b.id = 'ce-install';
     b.type = 'button';
-    b.innerHTML = '<span>앱으로 설치</span>';
-    b.setAttribute('style',
-      'position:fixed;left:18px;bottom:18px;z-index:9100;border:0;cursor:pointer;' +
-      'background:#fbbf24;color:#422006;font-family:inherit;font-size:12.5px;' +
-      'font-weight:800;padding:10px 16px;border-radius:11px;' +
-      'box-shadow:0 6px 18px rgba(245,158,11,.35)');
+    b.innerHTML = '<i class="ti ti-download"></i><span>앱으로 설치</span>';
+    b.title = '홈 화면에 추가해 앱처럼 씁니다';
     b.onclick = function () {
       if (!deferred) { b.remove(); return; }
       deferred.prompt();
@@ -202,6 +222,9 @@
       });
     };
     document.body.appendChild(b);
+    placeChip();
+    // 로그인하면 화면이 바뀌므로 자리를 다시 잡아 줍니다.
+    setInterval(placeChip, 1500);
   }
 
   /* 주소가 없으면 화면이 뜨기 전에 먼저 막는다 */

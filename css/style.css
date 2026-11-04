@@ -136,7 +136,24 @@ body{font-family:'Noto Sans KR',sans-serif;color:var(--text);font-size:14px;
 #topbar-clock{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap}
 .topbar-crumb{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#475569;
   font-weight:700;min-width:0;white-space:nowrap}
-.topbar-crumb i{font-size:16px;color:var(--gold-d)}
+.topbar-crumb > i{font-size:16px;color:var(--gold-d)}
+
+/* ── 앱으로 설치 단추 ──────────────────────────────────────────
+   설치할 수 있는 기기(안드로이드·크롬)에서만 저절로 나타납니다.
+   로그인 뒤에는 시계 옆으로, 로그인 화면에서는 아래쪽에 뜹니다. */
+.ce-install-inline{margin-left:6px;border:0;cursor:pointer;font-family:inherit;
+  background:var(--gold);color:var(--gold-ink);font-size:11.5px;font-weight:800;
+  padding:6px 12px;border-radius:9px;display:inline-flex;align-items:center;gap:5px;
+  white-space:nowrap;width:auto;box-shadow:0 2px 6px rgba(245,158,11,.3)}
+.ce-install-inline:hover{background:#fcd34d}
+.ce-install-inline i{font-size:14px}
+.student-topbar .ce-install-inline{margin-left:auto}
+.ce-install-float{position:fixed;left:18px;bottom:18px;z-index:9100;border:0;cursor:pointer;
+  font-family:inherit;background:var(--gold);color:var(--gold-ink);font-size:12.5px;
+  font-weight:800;padding:10px 16px;border-radius:11px;display:inline-flex;
+  align-items:center;gap:6px;width:auto;box-shadow:0 6px 18px rgba(245,158,11,.35)}
+.ce-install-float:hover{background:#fcd34d}
+@media(max-width:560px){.ce-install-inline span{display:none}}
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:7px;flex-wrap:nowrap;overflow:hidden}
 .topbar select{font-size:12.5px;padding:7px 10px;border-radius:11px;
   border:1px solid var(--border);background:#f8fafc;color:#334155;cursor:pointer;
