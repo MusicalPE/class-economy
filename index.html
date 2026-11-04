@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>교실 경제 시스템</title>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="css/style.css?v=2.0.0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div id="made-by">Made by <strong>음악적체육인</strong></div>
+
+<!-- 로딩 -->
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loading-text">처리 중...</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     로그인 화면
+══════════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <div id="login-logo-icon-wrap"><i class="ti ti-building-bank" style="font-size:48px;display:block;margin-bottom:8px;opacity:.9"></i></div>
+      <h1 id="login-title-text">교실 경제 시스템</h1>
+      <p id="login-subtitle-text">우리 반 경제를 함께 운영해요</p>
+    </div>
+    <div class="login-card">
+      <div class="login-tabs">
+        <button class="login-tab active" onclick="switchLoginTab('student')">
+          <i class="ti ti-user" style="font-size:14px"></i> 학생 로그인
+        </button>
+        <button class="login-tab" onclick="switchLoginTab('teacher')">
+          <i class="ti ti-shield" style="font-size:14px"></i> 교사 로그인
+        </button>
+      </div>
+
+      <!-- 학생 로그인 폼 -->
+      <div class="login-form active" id="form-student">
+        <div class="form-row">
+          <label class="form-label">출석 번호 선택</label>
+          <select class="form-input" id="login-num" onchange="onSelectStudent()">
+            <option value="">-- 번호를 선택하세요 --</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">이름</label>
+          <div class="student-name-disp" id="login-name-disp">번호를 선택하면 이름이 표시됩니다</div>
+        </div>
+        <div class="form-row">
+          <label class="form-label">비밀번호</label>
+          <input class="form-input" type="password" id="login-pw" placeholder="비밀번호 입력" onkeydown="if(event.key==='Enter')doStudentLogin()">
+        </div>
+        <div class="login-msg" id="student-login-msg"></div>
+        <button class="login-btn" onclick="doStudentLogin()">
+          <i class="ti ti-login"></i> 로그인
+        </button>
+        <div class="login-hint">초기 비밀번호는 <strong>출석번호</strong>입니다<br>예) 7번 학생 → 초기 비밀번호: 7</div>
+      </div>
+
+      <!-- 교사 로그인 폼 -->
+      <div class="login-form" id="form-teacher">
+        <div style="text-align:center;padding:8px 0 16px;color:var(--muted);font-size:13px">
+          <i class="ti ti-shield-check" style="font-size:32px;color:var(--c1);display:block;margin-bottom:8px"></i>
+          교사 관리자 계정으로 로그인합니다
+        </div>
+        <div class="form-row">
+          <label class="form-label">관리자 비밀번호</label>
+          <input class="form-input" type="password" id="admin-pw" placeholder="관리자 비밀번호 입력" onkeydown="if(event.key==='Enter')doAdminLogin()">
+        </div>
+        <div class="login-msg" id="teacher-login-msg"></div>
+        <button class="login-btn" onclick="doAdminLogin()">
+          <i class="ti ti-login"></i> 관리자 로그인
+        </button>
+        <div class="login-hint">비밀번호 관리 탭에서 변경할 수 있습니다</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     학생 화면
+══════════════════════════════════════════ -->
+<div id="student-screen">
+  <div class="student-topbar">
+    <i class="ti ti-building-bank" style="font-size:20px"></i>
+    <span id="app-title-student" style="font-weight:700;font-size:16px">교실 경제 시스템</span>
+    <div id="topbar-clock-student" style="font-size:12.5px;opacity:.9;font-weight:500;white-space:nowrap"></div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+      <div class="user-chip"><i class="ti ti-user"></i><span id="st-chip-name"></span></div>
+      <button class="topbar-btn red" onclick="doLogout()"><i class="ti ti-logout"></i> 로그아웃</button>
+    </div>
+  </div>
+
+  <div class="student-main">
+    <!-- 프로필 카드 -->
+    <div class="profile-card">
+      <div class="profile-top">
+        <div class="profile-avatar" id="st-avatar"></div>
+        <div>
+          <div class="profile-name" id="st-name"></div>
+          <div class="profile-sub" id="st-job-label"></div>
+        </div>
+      </div>
+      <div class="profile-stats">
+        <div class="profile-stat">
+          <div class="profile-stat-label">현재 잔액</div>
+          <div class="profile-stat-value" id="st-balance"></div>
+        </div>
+        <div class="profile-stat">
+          <div class="profile-stat-label">이번달 수입</div>
+          <div class="profile-stat-value" id="st-income"></div>
+        </div>
+        <div class="profile-stat">
+          <div class="profile-stat-label">이번달 지출</div>
+          <div class="profile-stat-value" id="st-expense"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 최근 거래 내역 -->
+    <div class="card">
+      <div class="card-title"><i class="ti ti-history"></i>최근 거래 내역</div>
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>날짜</th><th>유형</th><th>상세</th><th>금액</th><th>잔액</th></tr></thead>
+        <tbody id="st-ledger"></tbody>
+      </table></div>
+    </div>
+
+    <!-- ★ 상점지기 업무 (권한 있을 때만 표시) -->
+    <div class="card purple-card" id="st-shop-card" style="display:none">
+      <div class="card-title"><i class="ti ti-shopping-cart"></i>내 상점 <span class="badge badge-purple" id="st-shop-role"></span></div>
+
+      <div style="background:#faf5ff;border:1px solid var(--cp);border-radius:8px;padding:14px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:#5b21b6">판매 처리</div>
+        <div class="form-grid">
+          <div class="form-row-s"><label class="form-label-s">구매 학생</label><select id="st-sk-buyer"></select></div>
+          <div class="form-row-s"><label class="form-label-s">물품</label><select id="st-sk-item" onchange="stSkUpdatePrice()"></select></div>
+          <div class="form-row-s"><label class="form-label-s">수량</label><input id="st-sk-qty" type="number" value="1" min="1" oninput="stSkUpdatePrice()"></div>
+          <div class="form-row-s"><label class="form-label-s">결제 금액</label><input id="st-sk-price" type="text" readonly></div>
+        </div>
+        <button class="btn btn-purple" onclick="stSkDoBuy()"><i class="ti ti-shopping-bag"></i> 판매하기</button>
+        <div class="msg-box" id="st-sk-msg"></div>
+      </div>
+
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px">재고 현황</div>
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>물품명</th><th>카테고리</th><th>가격</th><th>남은 재고</th><th>상태</th></tr></thead>
+        <tbody id="st-sk-stock"></tbody>
+      </table></div>
+
+      <div id="st-sk-price-box" style="display:none;margin-top:14px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px">가격 변경</div>
+        <div id="st-sk-price-list"></div>
+        <div class="msg-box" id="st-sk-price-msg"></div>
+      </div>
+
+      <div id="st-sk-stock-box" style="display:none;margin-top:14px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px">재고 수정</div>
+        <div id="st-sk-stock-list"></div>
+        <div class="msg-box" id="st-sk-stock-msg"></div>
+      </div>
+    </div>
+
+    <!-- ★ 은행 업무 (권한 있을 때만 표시) -->
+    <div class="card" id="st-bank-card" style="display:none;border:1.5px solid #d97706">
+      <div class="card-title"><i class="ti ti-building-bank"></i>은행 창구 <span class="badge badge-yellow">은행직원</span></div>
+
+      <div style="background:#fffbeb;border:1px solid #f59e0b;border-radius:8px;padding:14px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:#92400e">적금 개설 신청</div>
+        <div class="form-grid">
+          <div class="form-row-s"><label class="form-label-s">예금주</label><select id="st-bk-depositor" onchange="stBkUpdateBal()"></select></div>
+          <div class="form-row-s"><label class="form-label-s">예금주 잔액</label><input id="st-bk-bal" type="text" readonly></div>
+          <div class="form-row-s"><label class="form-label-s">납입 원금 (원)</label><input id="st-bk-principal" type="number" min="0" placeholder="0" oninput="stBkUpdateCalc()"></div>
+          <div class="form-row-s"><label class="form-label-s">기간</label>
+            <select id="st-bk-days" onchange="stBkOnDaysChange()">
+              <option value="15">15일 (단기)</option>
+              <option value="30">30일 (1개월)</option>
+            </select>
+          </div>
+        </div>
+
+        <label class="form-label-s">이자율 선택 <span id="st-bk-hint" style="font-size:11px;color:var(--muted)"></span></label>
+        <div class="rate-slider-box">
+          <div style="display:flex;align-items:flex-end;gap:10px;margin-bottom:8px">
+            <div><div class="rate-big" id="st-bk-rate-disp">5.0%</div><div class="rate-sub">현재 이자율</div></div>
+            <div style="flex:1;text-align:right"><div style="font-size:13px;color:var(--c2);font-weight:700" id="st-bk-payout">납입 원금을 입력하세요</div><div class="rate-sub">만기 수령 예상액</div></div>
+          </div>
+          <input type="range" class="rate-slider" id="st-bk-slider" min="0" max="50" step="0.5" value="5" oninput="stBkOnSlider(this.value)">
+          <div class="rate-tick-labels"><span>0%</span><span>10%</span><span>20%</span><span>30%</span><span>40%</span><span>50%</span></div>
+          <div class="rate-presets">
+            <span class="rate-preset-lbl">빠른 선택:</span>
+            <button class="rate-preset-btn" onclick="stBkSetRate(0)">0%</button>
+            <button class="rate-preset-btn" onclick="stBkSetRate(3)">3%</button>
+            <button class="rate-preset-btn" onclick="stBkSetRate(5)">5%</button>
+            <button class="rate-preset-btn" onclick="stBkSetRate(7)">7%</button>
+            <button class="rate-preset-btn" onclick="stBkSetRate(10)">10%</button>
+            <button class="rate-preset-btn" onclick="stBkSetRate(15)">15%</button>
+            <button class="rate-preset-btn" onclick="stBkSetRate(20)">20%</button>
+            <button class="rate-preset-btn" onclick="stBkSetRate(30)">30%</button>
+          </div>
+        </div>
+
+        <div style="background:#fef9c3;border:1px solid #f59e0b;border-radius:8px;padding:10px;font-size:12px;color:#92400e;margin:12px 0">
+          <i class="ti ti-info-circle"></i> 신청 후 <strong>선생님 승인</strong>이 있어야 적금이 시작됩니다.
+        </div>
+        <button class="btn" style="background:#d97706;color:#fff;border-color:#d97706" onclick="stBkCreate()"><i class="ti ti-send"></i> 적금 신청</button>
+        <div class="msg-box" id="st-bk-msg"></div>
+      </div>
+
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px">내가 신청한 적금</div>
+      <div id="st-bk-list"><div class="empty">불러오는 중...</div></div>
+    </div>
+
+    <!-- ★ 건의사항 -->
+    <div class="card" style="border:1.5px solid var(--c1)">
+      <div class="card-title"><i class="ti ti-send"></i>선생님께 건의하기</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">
+        학급을 더 좋게 만들 아이디어가 있으면 선생님께 보내주세요. 하루 3건까지 보낼 수 있어요.
+      </p>
+
+      <div class="form-grid">
+        <div class="form-row-s"><label class="form-label-s">이름</label><input id="sug-name" type="text" readonly></div>
+        <div class="form-row-s"><label class="form-label-s">분류</label>
+          <select id="sug-category">
+            <option>학급 규칙</option>
+            <option>직업 · 급여</option>
+            <option>상점 물품</option>
+            <option>학급 행사</option>
+            <option>자리 배치</option>
+            <option>칭찬하고 싶은 친구</option>
+            <option>불편한 점</option>
+            <option>기타</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row-s"><label class="form-label-s">건의 제목</label>
+        <input id="sug-title" type="text" placeholder="예) 상점에 학용품을 추가해 주세요" maxlength="60"></div>
+
+      <div class="form-row-s"><label class="form-label-s">건의 내용</label>
+        <textarea id="sug-body" rows="4" placeholder="어떤 것을 건의하고 싶은지 자세히 적어주세요" maxlength="500" style="resize:vertical"></textarea></div>
+
+      <div class="form-row-s"><label class="form-label-s">제안한 이유</label>
+        <textarea id="sug-reason" rows="3" placeholder="왜 이런 생각을 하게 되었는지 적어주세요" maxlength="500" style="resize:vertical"></textarea></div>
+
+      <button class="btn btn-primary" onclick="doSubmitSuggestion()"><i class="ti ti-send"></i> 건의 보내기</button>
+      <div class="msg-box" id="sug-msg"></div>
+
+      <div style="margin-top:18px;border-top:1px solid var(--border);padding-top:14px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px">내가 보낸 건의</div>
+        <div id="sug-my-list"><div class="empty">불러오는 중...</div></div>
+      </div>
+    </div>
+
+    <!-- 비밀번호 변경 -->
+    <div class="card">
+      <div class="card-title"><i class="ti ti-lock"></i>비밀번호 변경</div>
+      <div class="form-grid">
+        <div class="form-row-s"><label class="form-label-s">현재 비밀번호</label><input type="password" id="st-cur-pw" placeholder="현재 비밀번호"></div>
+        <div class="form-row-s"><label class="form-label-s">새 비밀번호</label><input type="password" id="st-new-pw" placeholder="새 비밀번호 (4자리 이상)"></div>
+        <div class="form-row-s" style="grid-column:span 2"><label class="form-label-s">새 비밀번호 확인</label><input type="password" id="st-confirm-pw" placeholder="새 비밀번호 재입력"></div>
+      </div>
+      <button class="btn btn-primary" onclick="doChangeStudentPw()"><i class="ti ti-lock"></i> 비밀번호 변경</button>
+      <p style="font-size:11px;color:var(--muted);margin-top:8px"><i class="ti ti-info-circle"></i> 비밀번호를 잊어버렸다면 선생님께 초기화를 요청하세요</p>
+      <div class="msg-box" id="st-pw-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     교사 관리자 화면
+══════════════════════════════════════════ -->
+<div class="app-screen" id="admin-screen">
+  <div class="topbar">
+    <div class="topbar-logo" onclick="goHome()" title="대시보드로 이동" style="cursor:pointer"><i class="ti ti-building-bank"></i><span id="app-title-admin">교실 경제 시스템</span></div>
+    <div id="topbar-clock" style="font-size:12.5px;opacity:.9;font-weight:500;white-space:nowrap;padding-left:4px"></div>
+    <div class="topbar-right">
+      <select id="curMonth" onchange="onChangeMonth()" title="현재 월" style="min-width:76px;max-width:none">
+        <option value="3">3월</option><option value="4">4월</option><option value="5" selected>5월</option>
+        <option value="6">6월</option><option value="7">7월</option><option value="8">8월</option>
+        <option value="9">9월</option><option value="10">10월</option><option value="11">11월</option>
+        <option value="12">12월</option><option value="1">1월</option><option value="2">2월</option>
+      </select>
+      <select id="curHalf" onchange="onChangeHalf()" title="급여 회차" style="min-width:92px;max-width:none">
+        <option value="1">상반기</option>
+        <option value="2">하반기</option>
+      </select>
+      <button class="topbar-btn" onclick="openSalaryModal()" title="급여 지급"><i class="ti ti-coins"></i> 급여</button>
+      <button class="topbar-btn" onclick="openBonusModal()" title="보너스 지급"><i class="ti ti-gift"></i> 보너스</button>
+      <div class="user-chip"><i class="ti ti-shield"></i><span>교사</span></div>
+      <button class="topbar-btn red" onclick="doLogout()" title="로그아웃"><i class="ti ti-logout"></i></button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar">
+      <div class="nav-section">개요</div>
+      <div class="nav-item active" onclick="showPage('dashboard')"><i class="ti ti-dashboard"></i><span>대시보드</span></div>
+      <div class="nav-item" onclick="showPage('charts')"><i class="ti ti-chart-bar"></i><span>잔액 그래프</span></div>
+      <div class="nav-section">관리</div>
+      <div class="nav-item" onclick="showPage('students')"><i class="ti ti-users"></i><span>학생 명단</span></div>
+      <div class="nav-item" onclick="showPage('jobs')"><i class="ti ti-briefcase"></i><span>직업 관리</span></div>
+      <div class="nav-item" onclick="showPage('assign')"><i class="ti ti-user-check"></i><span>직업 배정</span></div>
+      <div class="nav-section">경제</div>
+      <div class="nav-item" onclick="showPage('salary')"><i class="ti ti-cash"></i><span>급여 설정</span></div>
+      <div class="nav-item" onclick="showPage('tax')"><i class="ti ti-receipt"></i><span>세금</span></div>
+      <div class="nav-item" onclick="showPage('shop')"><i class="ti ti-shopping-cart"></i><span>물품 구입</span></div>
+      <div class="nav-item" onclick="showPage('treasury')"><i class="ti ti-building-bank"></i><span>학급 금고</span></div>
+      <div class="nav-item" onclick="showPage('shopperms')"><i class="ti ti-shield-check"></i><span>권한 관리</span></div>
+      <div class="nav-item" onclick="showPage('savings')"><i class="ti ti-coin"></i><span>적금 현황</span><span class="nav-badge" id="savings-badge" style="display:none">0</span></div>
+      <div class="nav-item" onclick="showPage('suggestions')"><i class="ti ti-send"></i><span>건의함</span><span class="nav-badge" id="sug-badge" style="display:none">0</span></div>
+      <div class="nav-item" onclick="showPage('ledger')"><i class="ti ti-book"></i><span>거래 내역</span></div>
+      <div class="nav-section">설정</div>
+      <div class="nav-item" onclick="showPage('settings')"><i class="ti ti-palette"></i><span>화면 설정</span></div>
+      <div class="nav-item" onclick="showPage('passwords')">
+        <i class="ti ti-lock"></i><span>비밀번호 관리</span>
+      </div>
+      <div class="nav-item" onclick="showPage('reset')"><i class="ti ti-trash"></i><span>초기화</span></div>
+      <div class="nav-section">역할 모드</div>
+      <div class="nav-item" onclick="openSkLogin()"><i class="ti ti-shopping-cart"></i><span>상점지기</span></div>
+      <div class="nav-item" onclick="openBankLogin()"><i class="ti ti-building-bank"></i><span>은행 창구</span></div>
+      <div class="nav-item sk-only" id="nav-sk" onclick="showPage('sk-store')" style="display:none"><i class="ti ti-shopping-cart"></i><span>내 상점</span></div>
+      <div class="nav-item sk-only" id="nav-bank" onclick="showPage('bank-mode')" style="display:none"><i class="ti ti-building-bank"></i><span>내 은행</span></div>
+    </div>
+
+    <div class="main">
+      <div class="sk-banner" id="sk-banner">
+        <i class="ti ti-shopping-cart"></i>
+        <div class="sk-banner-text"><strong id="sk-banner-name"></strong><span id="sk-banner-perms"></span></div>
+        <button class="exit-btn" onclick="exitSkMode()">모드 종료</button>
+      </div>
+
+      <div class="sk-banner" id="bank-banner" style="background:linear-gradient(135deg,#d97706,#f59e0b)">
+        <i class="ti ti-building-bank"></i>
+        <div class="sk-banner-text"><strong id="bank-banner-name"></strong><span id="bank-banner-role"></span></div>
+        <button class="exit-btn" onclick="exitBankMode()">모드 종료</button>
+      </div>
+
+      <!-- 대시보드 -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-title"><i class="ti ti-dashboard"></i>대시보드</div>
+        <div class="stat-grid" id="dash-stats"></div>
+        <div class="card"><div class="card-title"><i class="ti ti-users"></i>학생 잔액 현황</div>
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>번호</th><th>이름</th><th>직업</th><th>잔액</th><th>이번달 수입</th><th>이번달 지출</th></tr></thead>
+            <tbody id="dash-table"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- 잔액 그래프 -->
+      <div class="page" id="page-charts">
+        <div class="page-title"><i class="ti ti-chart-bar"></i>잔액 그래프</div>
+        <div class="stat-grid" id="chart-stats"></div>
+        <div class="chart-grid">
+          <div class="chart-box full">
+            <div class="chart-title"><i class="ti ti-chart-bar"></i>학생별 잔액
+              <div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <select id="sort-mode" onchange="renderCharts()" style="width:auto;font-size:12px;padding:4px 8px">
+                  <option value="num">번호순</option><option value="desc">높은순</option><option value="asc">낮은순</option>
+                </select>
+                <select id="color-mode" onchange="renderCharts()" style="width:auto;font-size:12px;padding:4px 8px">
+                  <option value="rank">순위별 색상</option><option value="job">직업별 색상</option><option value="single">단색</option>
+                </select>
+              </div>
+            </div>
+            <div style="overflow-x:auto"><div id="chart-bar-wrap" style="position:relative;height:280px;min-width:100%"><canvas id="chart-bar"></canvas></div></div>
+          </div>
+          <div class="chart-box full">
+            <div class="chart-title"><i class="ti ti-chart-line"></i>월별 거래 추이
+              <select id="trend-type" onchange="renderTrendChart()" style="margin-left:auto;width:auto;font-size:12px;padding:4px 8px">
+                <option value="all">전체</option><option value="급여">급여</option><option value="보너스">보너스</option><option value="세금">세금</option><option value="물품구입">물품구입</option>
+              </select>
+            </div>
+            <div style="position:relative;height:200px"><canvas id="chart-trend"></canvas></div>
+          </div>
+          <div class="chart-box full">
+            <div class="chart-title"><i class="ti ti-exchange"></i>학생별 수입 vs 지출 (이번달)</div>
+            <div style="overflow-x:auto"><div id="chart-inout-wrap" style="position:relative;height:240px;min-width:100%"><canvas id="chart-inout"></canvas></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 학생 명단 -->
+      <div class="page" id="page-students">
+        <div class="page-title"><i class="ti ti-users"></i>학생 명단</div>
+        <div class="card">
+          <div class="toolbar"><button class="btn btn-primary" onclick="openStudentModal(-1)"><i class="ti ti-plus"></i> 학생 추가</button></div>
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>번호</th><th>이름</th><th>직업</th><th>초기 잔액</th><th>현재 잔액</th><th>관리</th></tr></thead>
+            <tbody id="student-table"></tbody>
+          </table></div>
+          <div class="empty" id="student-empty" style="display:none">학생이 없습니다.</div>
+        </div>
+      </div>
+
+      <!-- 직업 관리 -->
+      <div class="page" id="page-jobs">
+        <div class="page-title"><i class="ti ti-briefcase"></i>직업 관리</div>
+        <div class="card">
+          <div class="toolbar"><button class="btn btn-primary" onclick="openJobModal(-1)"><i class="ti ti-plus"></i> 직업 추가</button></div>
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>직업명</th><th>기본 급여</th><th>최대 인원</th><th>현재 인원</th><th>상점권한</th><th>설명</th><th>관리</th></tr></thead>
+            <tbody id="job-table"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- 직업 배정 -->
+      <div class="page" id="page-assign">
+        <div class="page-title"><i class="ti ti-user-check"></i>직업 배정</div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-user-check"></i>직업 배정하기</div>
+          <div class="form-grid">
+            <div class="form-row-s"><label class="form-label-s">학생 선택</label><select id="assign-student"></select></div>
+            <div class="form-row-s"><label class="form-label-s">배정할 직업</label><select id="assign-job"></select></div>
+          </div>
+          <button class="btn btn-primary" onclick="doAssign()"><i class="ti ti-check"></i> 배정 확인</button>
+          <div class="msg-box" id="assign-msg"></div>
+        </div>
+        <div class="card"><div class="card-title"><i class="ti ti-list"></i>직업별 배정 현황</div><div id="assign-overview"></div></div>
+      </div>
+
+      <!-- 급여 설정 -->
+      <div class="page" id="page-salary">
+        <div class="page-title"><i class="ti ti-cash"></i>급여 설정</div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-cash"></i><span id="salary-month-label">급여 설정</span></div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:14px">비워두면 기본 급여가 적용됩니다.</p>
+          <div id="salary-settings" class="form-grid"></div>
+        </div>
+      </div>
+
+      <!-- 세금 -->
+      <div class="page" id="page-tax">
+        <div class="page-title"><i class="ti ti-receipt"></i>세금 부과</div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-receipt"></i>세금 부과하기</div>
+          <div class="form-grid">
+            <div class="form-row-s"><label class="form-label-s">대상 학생</label><select id="tax-student"><option value="">전체 학생</option></select></div>
+            <div class="form-row-s"><label class="form-label-s">세금 종류</label><select id="tax-type"><option>소득세</option><option>재산세</option><option>특별세</option><option>벌금</option><option>기타</option></select></div>
+            <div class="form-row-s"><label class="form-label-s">금액 / 비율</label><input id="tax-amount" type="number" min="0" placeholder="숫자 입력"></div>
+            <div class="form-row-s"><label class="form-label-s">방식</label><select id="tax-mode"><option value="fixed">고정 금액 (원)</option><option value="percent">잔액의 % 차감</option></select></div>
+          </div>
+          <div class="form-row-s"><label class="form-label-s">메모</label><input id="tax-memo" type="text" placeholder="사유 입력"></div>
+          <button class="btn btn-danger" onclick="doTax()"><i class="ti ti-receipt"></i> 세금 부과</button>
+          <div class="msg-box" id="tax-msg"></div>
+        </div>
+        <div class="card"><div class="card-title"><i class="ti ti-history"></i>최근 세금 내역</div>
+          <div class="tbl-wrap"><table class="tbl"><thead><tr><th>날짜</th><th>학생</th><th>종류</th><th>금액</th><th>메모</th></tr></thead><tbody id="tax-history"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- 물품 구입 -->
+      <div class="page" id="page-shop">
+        <div class="page-title"><i class="ti ti-shopping-cart"></i>물품 구입</div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-package"></i>물품 목록</div>
+          <div class="toolbar">
+            <button class="btn btn-primary btn-sm" onclick="openItemModal(-1)"><i class="ti ti-plus"></i> 물품 추가</button>
+            <div class="toolbar-right" style="display:flex;gap:6px">
+              <button class="btn btn-sm" onclick="doInitRefillTrigger()"><i class="ti ti-clock"></i> 자동 리필 켜기</button>
+              <button class="btn btn-sm btn-green" onclick="doRunRefillNow()"><i class="ti ti-refresh"></i> 지금 리필</button>
+            </div>
+          </div>
+          <div class="msg-box" id="refill-msg"></div>
+          <div class="tbl-wrap"><table class="tbl"><thead><tr><th>물품명</th><th>카테고리</th><th>가격</th><th>재고</th><th>재입고</th><th>설명</th><th>관리</th></tr></thead><tbody id="shop-items-table"></tbody></table></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-credit-card"></i>구입 처리</div>
+          <div class="form-grid">
+            <div class="form-row-s"><label class="form-label-s">학생</label><select id="buy-student"></select></div>
+            <div class="form-row-s"><label class="form-label-s">물품</label><select id="buy-item" onchange="updateBuyPrice()"></select></div>
+            <div class="form-row-s"><label class="form-label-s">수량</label><input id="buy-qty" type="number" value="1" min="1" onchange="updateBuyPrice()"></div>
+            <div class="form-row-s"><label class="form-label-s">결제 금액</label><input id="buy-price" type="number" readonly></div>
+          </div>
+          <button class="btn btn-primary" onclick="doBuy()"><i class="ti ti-shopping-bag"></i> 구입 처리</button>
+          <div class="msg-box" id="buy-msg"></div>
+        </div>
+      </div>
+
+      <!-- 상점 권한 -->
+      <div class="page" id="page-shopperms">
+        <div class="page-title"><i class="ti ti-shield-check"></i>권한 관리</div>
+        <div class="acc-head" id="acc-head-shop" onclick="toggleSection('shop')">
+          <i class="ti ti-shopping-cart" style="color:var(--cp)"></i>
+          <span style="color:var(--cp)">상점 권한</span>
+          <i class="ti ti-chevron-down acc-arrow" id="acc-arrow-shop"></i>
+        </div>
+        <div class="acc-body" id="acc-body-shop">
+        <div class="card" style="border-color:var(--cp)">
+          <div class="card-title"><i class="ti ti-info-circle"></i>권한 종류</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;font-size:12px">
+            <div style="padding:8px;border-radius:7px;background:#dbeafe"><strong style="color:#1e40af">판매</strong><br>구입 처리만 가능</div>
+            <div style="padding:8px;border-radius:7px;background:#fef9c3"><strong style="color:#854d0e">가격변경</strong><br>판매+가격수정</div>
+            <div style="padding:8px;border-radius:7px;background:#dcfce7"><strong style="color:#166534">재고관리</strong><br>판매+재고수정</div>
+            <div style="padding:8px;border-radius:7px;background:var(--cpl)"><strong style="color:#5b21b6">전체관리</strong><br>추가/수정/삭제</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="toolbar">
+            <div class="card-title" style="margin:0"><i class="ti ti-list-check"></i>권한 목록</div>
+            <div class="toolbar-right"><button class="btn btn-purple btn-sm" onclick="openPermModal(-1)"><i class="ti ti-plus"></i> 권한 추가</button></div>
+          </div>
+          <div class="tbl-wrap"><table class="tbl"><thead><tr><th>직업명</th><th>카테고리</th><th>권한</th><th>배정 학생</th><th>관리</th></tr></thead><tbody id="perm-table"></tbody></table></div>
+        </div>
+
+        </div>
+
+        <div class="acc-head" id="acc-head-bank" onclick="toggleSection('bank')">
+          <i class="ti ti-building-bank" style="color:#d97706"></i>
+          <span style="color:#d97706">은행 권한</span>
+          <i class="ti ti-chevron-down acc-arrow" id="acc-arrow-bank"></i>
+        </div>
+        <div class="acc-body" id="acc-body-bank">
+
+        <div class="card" style="border-color:#d97706">
+          <div class="card-title"><i class="ti ti-info-circle"></i>역할 안내</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px">
+            <div style="padding:10px;border-radius:8px;background:#fef3c7"><strong style="color:#92400e">🏦 은행직원</strong><br>적금 개설, 조회 가능</div>
+            <div style="padding:10px;border-radius:8px;background:#fef9c3"><strong style="color:#713f12">👑 은행장</strong><br>은행직원 권한 + 기본 이자율 설정</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="toolbar">
+            <div class="card-title" style="margin:0"><i class="ti ti-list-check"></i>은행 권한 목록</div>
+            <div class="toolbar-right"><button class="btn btn-sm" style="background:#d97706;color:#fff;border-color:#d97706" onclick="openBankPermModal(-1)"><i class="ti ti-plus"></i> 권한 추가</button></div>
+          </div>
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>직업명</th><th>역할</th><th>배정 학생</th><th>관리</th></tr></thead>
+            <tbody id="bankperm-table"></tbody>
+          </table></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-settings"></i>기본 이자율 설정</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:12px">은행 모드에서 적금 개설 시 기본으로 적용되는 이자율입니다. (은행직원이 개설 시 조정 가능)</p>
+          <div class="form-grid">
+            <div class="form-row-s"><label class="form-label-s">15일 기본 이자율 (%)</label><input id="bank-rate15" type="number" min="0" max="50" step="0.1" placeholder="예) 5"></div>
+            <div class="form-row-s"><label class="form-label-s">30일 기본 이자율 (%)</label><input id="bank-rate30" type="number" min="0" max="50" step="0.1" placeholder="예) 10"></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn" style="background:#d97706;color:#fff;border-color:#d97706" onclick="doSaveBankSettings()"><i class="ti ti-device-floppy"></i> 저장</button>
+            <button class="btn" onclick="doInitTrigger()"><i class="ti ti-clock"></i> 자동 해약 트리거 설정</button>
+            <button class="btn btn-sm btn-green" onclick="doProcessMature()"><i class="ti ti-refresh"></i> 지금 만기 처리</button>
+          </div>
+          <div class="msg-box" id="bank-settings-msg"></div>
+        </div>
+        </div>
+      </div>
+
+      <!-- ★ 비밀번호 관리 -->
+      <div class="page" id="page-passwords">
+        <div class="page-title"><i class="ti ti-lock"></i>비밀번호 관리</div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-shield"></i>교사 비밀번호 변경</div>
+          <div class="form-grid">
+            <div class="form-row-s"><label class="form-label-s">현재 비밀번호</label><input type="password" id="admin-cur-pw" placeholder="현재 비밀번호"></div>
+            <div class="form-row-s"><label class="form-label-s">새 비밀번호</label><input type="password" id="admin-new-pw" placeholder="새 비밀번호 (4자리 이상)"></div>
+          </div>
+          <button class="btn btn-primary" onclick="doChangeAdminPw()"><i class="ti ti-lock"></i> 변경</button>
+          <div class="msg-box" id="admin-pw-msg"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-users"></i>학생 비밀번호 관리</div>
+          <div class="toolbar">
+            <span style="font-size:12px;color:var(--muted)">초기 비밀번호 = 출석번호</span>
+            <div class="toolbar-right"><button class="btn btn-sm btn-danger" onclick="doResetAll()"><i class="ti ti-refresh"></i> 전체 초기화</button></div>
+          </div>
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>번호</th><th>이름</th><th>현재 비밀번호</th><th>변경</th><th>초기화</th></tr></thead>
+            <tbody id="pw-table"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- ★ 학급 금고 -->
+      <div class="page" id="page-treasury">
+        <div class="page-title"><i class="ti ti-building-bank"></i>학급 금고</div>
+
+        <div class="card" style="background:linear-gradient(135deg,var(--c2) 0%,#34d399 100%);color:#fff;border:none">
+          <div style="font-size:13px;opacity:.85;margin-bottom:4px">현재 금고 잔액</div>
+          <div style="font-size:38px;font-weight:800;letter-spacing:-1px" id="tre-balance">0원</div>
+          <div style="font-size:12px;opacity:.8;margin-top:6px">
+            세금과 물품 판매 대금이 이곳에 모입니다
+          </div>
+        </div>
+
+        <div class="stat-grid" id="tre-stats"></div>
+
+        <div class="card" style="border:1.5px solid var(--c1)">
+          <div class="card-title"><i class="ti ti-cash"></i>학급 운영비 지원</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:14px">
+            학교에서 배정된 학급 운영비를 금고에 넣습니다. 학기 초에 한 번 넣어두면
+            그 예산으로 급여를 지급하게 됩니다.
+          </p>
+          <div class="form-grid">
+            <div class="form-row-s"><label class="form-label-s">지원 항목</label>
+              <select id="tre-budget-type">
+                <option>학기 초 예산 지원</option>
+                <option>학급 운영비</option>
+                <option>추가 예산 지원</option>
+                <option>학교 지원금</option>
+              </select>
+            </div>
+            <div class="form-row-s"><label class="form-label-s">금액 (원)</label><input id="tre-budget-amount" type="number" min="0" placeholder="예) 100000"></div>
+          </div>
+          <div class="form-row-s"><label class="form-label-s">내용</label><input id="tre-budget-detail" type="text" placeholder="예) 2학기 학급 운영비"></div>
+          <button class="btn btn-primary" onclick="doTreasuryBudget()"><i class="ti ti-cash"></i> 예산 지원하기</button>
+          <div class="msg-box" id="tre-budget-msg"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="ti ti-shopping-bag"></i>금고에서 지출</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:14px">
+            학급 행사나 이벤트에 금고의 돈을 사용합니다. 학생 개인 잔액에는 영향이 없습니다.
+          </p>
+          <div class="form-grid">
+            <div class="form-row-s"><label class="form-label-s">지출 항목</label>
+              <select id="tre-spend-type">
+                <option>영화 상영</option>
+                <option>학급 놀이</option>
+                <option>간식 파티</option>
+                <option>학급 물품 구입</option>
+                <option>보상 · 시상</option>
+                <option>현장학습</option>
+                <option>기타</option>
+              </select>
+            </div>
+            <div class="form-row-s"><label class="form-label-s">금액 (원)</label><input id="tre-spend-amount" type="number" min="0" placeholder="0"></div>
+          </div>
+          <div class="form-row-s"><label class="form-label-s">내용</label><input id="tre-spend-detail" type="text" placeholder="예) 겨울왕국 상영 - 팝콘 구입"></div>
+          <button class="btn btn-danger" onclick="doTreasurySpend()"><i class="ti ti-shopping-bag"></i> 금고에서 지출</button>
+          <div class="msg-box" id="tre-spend-msg"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="ti ti-plus"></i>금고에 입금</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:14px">
+            벌금, 기부, 금액 보정 등 별도로 금고에 넣을 때 사용합니다.
+          </p>
+          <div class="form-grid">
+            <div class="form-row-s"><label class="form-label-s">입금 항목</label>
+              <select id="tre-dep-type">
+                <option>기부</option>
+                <option>벌금</option>
+                <option>학급 수익</option>
+                <option>금액 보정</option>
+                <option>기타</option>
+              </select>
+            </div>
+            <div class="form-row-s"><label class="form-label-s">금액 (원)</label><input id="tre-dep-amount" type="number" min="0" placeholder="0"></div>
+          </div>
+          <div class="form-row-s"><label class="form-label-s">내용</label><input id="tre-dep-detail" type="text" placeholder="예) 알뜰시장 수익금"></div>
+          <button class="btn btn-green" onclick="doTreasuryDeposit()"><i class="ti ti-plus"></i> 금고에 입금</button>
+          <div class="msg-box" id="tre-dep-msg"></div>
+        </div>
+
+        <div class="card">
+          <div class="toolbar">
+            <div class="card-title" style="margin:0"><i class="ti ti-book"></i>금고 거래 내역</div>
+            <div class="toolbar-right">
+              <select id="tre-filter" onchange="renderTreasury()" style="width:auto">
+                <option value="all">전체</option>
+                <option value="수입">수입만</option>
+                <option value="지출">지출만</option>
+              </select>
+            </div>
+          </div>
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>날짜</th><th>구분</th><th>항목</th><th>내용</th><th>금액</th><th>금고 잔액</th></tr></thead>
+            <tbody id="tre-table"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- ★ 초기화 -->
+      <div class="page" id="page-reset">
+        <div class="page-title"><i class="ti ti-trash"></i>초기화</div>
+
+        <div class="card" style="border:1.5px solid var(--cd);background:#fff5f5">
+          <div class="card-title"><i class="ti ti-info-circle"></i>주의</div>
+          <p style="font-size:13px;color:#9b1c1c;line-height:1.7;margin:0">
+            초기화한 데이터는 <strong>되돌릴 수 없습니다.</strong><br>
+            실행 전에 스프레드시트를 복사해 두시는 것을 권합니다.
+            (구글 시트 → 파일 → 사본 만들기)
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="ti ti-user"></i>학생 개인 초기화</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:14px">
+            선택한 학생의 <strong>거래내역과 적금</strong>을 모두 지우고, 잔액을 초기 잔액으로 되돌립니다.
+            학생 명단·직업 배정·비밀번호는 그대로 유지됩니다.
+          </p>
+          <div class="form-grid">
+            <div class="form-row-s"><label class="form-label-s">대상 학생</label><select id="reset-student" onchange="updateResetPreview()"></select></div>
+            <div class="form-row-s"><label class="form-label-s">초기화 후 잔액</label><input id="reset-student-preview" type="text" readonly></div>
+          </div>
+          <button class="btn btn-danger" onclick="doResetStudent()"><i class="ti ti-refresh"></i> 이 학생 초기화</button>
+          <div class="msg-box" id="reset-student-msg"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="ti ti-cash"></i>급여 지급 취소</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:12px">
+            상단바에서 선택한 회차의 급여 지급을 되돌립니다.
+            학생 잔액에서 차감되고 금액은 학급 금고로 돌아갑니다. 잘못 지급했을 때 사용하세요.
+          </p>
+          <button class="btn btn-danger" onclick="doCancelPayPeriod()"><i class="ti ti-refresh"></i> 선택한 회차 급여 취소</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="ti ti-refresh"></i>재입고 제한 해제</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:12px">
+            물품 재입고는 주 1회(월요일 자정 기준)만 가능합니다.
+            사정이 있어 다시 열어주려면 아래 버튼을 누르세요. 재고는 그대로 유지됩니다.
+          </p>
+          <button class="btn" onclick="doResetRestock()"><i class="ti ti-refresh"></i> 이번 주 재입고 제한 해제</button>
+          <div class="msg-box" id="reset-restock-msg"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="ti ti-users"></i>반 전체 초기화</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:14px">범위를 선택한 뒤 실행하세요.</p>
+
+          <div style="border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px">
+            <div style="font-weight:600;font-size:13px;margin-bottom:6px">거래 기록만 초기화 <span class="badge badge-yellow">권장</span></div>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6">
+              모든 학생의 거래내역과 적금을 지우고 잔액을 초기 잔액으로 되돌립니다.<br>
+              학생 명단, 직업, 물품, 비밀번호는 유지됩니다. <strong>새 학기를 시작할 때</strong> 쓰세요.
+            </p>
+            <button class="btn btn-danger" onclick="doResetClass('transactions')"><i class="ti ti-refresh"></i> 거래 기록 초기화</button>
+          </div>
+
+          <div style="border:1.5px solid var(--cd);border-radius:8px;padding:14px;background:#fff5f5">
+            <div style="font-weight:600;font-size:13px;margin-bottom:6px;color:#9b1c1c">전체 초기화 <span class="badge badge-red">위험</span></div>
+            <p style="font-size:12px;color:#9b1c1c;margin-bottom:10px;line-height:1.6">
+              거래내역·적금에 더해 <strong>학생 명단, 직업 배정, 비밀번호까지</strong> 모두 지웁니다.<br>
+              직업 목록과 물품 목록은 남습니다. <strong>새 학년을 시작할 때</strong> 쓰세요.
+            </p>
+            <button class="btn btn-danger" onclick="doResetClass('all')"><i class="ti ti-trash"></i> 전체 초기화</button>
+          </div>
+          <div class="msg-box" id="reset-class-msg"></div>
+        </div>
+      </div>
+
+      <!-- ★ 건의함 -->
+      <div class="page" id="page-suggestions">
+        <div class="page-title"><i class="ti ti-send"></i>건의함</div>
+        <div class="stat-grid" id="sug-stats"></div>
+        <div class="card">
+          <div class="toolbar">
+            <select id="sug-filter" onchange="renderSuggestions()" style="width:auto">
+              <option value="all">전체</option>
+              <option value="접수">새 건의</option>
+              <option value="검토중">검토중</option>
+              <option value="반영">반영됨</option>
+              <option value="보류">보류</option>
+            </select>
+            <div class="toolbar-right">
+              <button class="btn btn-sm" onclick="renderSuggestions()"><i class="ti ti-refresh"></i> 새로고침</button>
+            </div>
+          </div>
+          <div id="sug-list"></div>
+        </div>
+      </div>
+
+      <!-- 거래 내역 -->
+      <div class="page" id="page-ledger">
+        <div class="page-title"><i class="ti ti-book"></i>거래 내역</div>
+        <div class="card">
+          <div class="toolbar">
+            <select id="ledger-filter" onchange="renderLedger()" style="width:auto">
+              <option value="all">전체</option><option value="급여">급여</option><option value="세금">세금</option>
+              <option value="물품구입">물품구입</option><option value="수동조정">수동조정</option>
+            </select>
+            <button class="btn btn-sm" onclick="loadLedger()"><i class="ti ti-refresh"></i> 새로고침</button>
+          </div>
+          <div class="tbl-wrap"><table class="tbl"><thead><tr><th>날짜</th><th>학생</th><th>유형</th><th>상세</th><th>금액</th><th>학생 잔액</th><th>금고 잔액</th></tr></thead><tbody id="ledger-table"></tbody></table></div>
+          <div class="empty" id="ledger-empty" style="display:none">거래 내역이 없습니다.</div>
+        </div>
+      </div>
+
+
+      <!-- ★ 적금 현황 -->
+      <div class="page" id="page-savings">
+        <div class="page-title"><i class="ti ti-coin"></i>적금 현황</div>
+        <div class="stat-grid" id="savings-stats"></div>
+
+        <!-- 교사 직접 적금 개설 -->
+        <div class="card" style="border:1.5px solid #d97706">
+          <div class="card-title"><i class="ti ti-plus"></i>적금 개설 (교사)</div>
+          <div class="form-grid">
+            <div class="form-row-s"><label class="form-label-s">예금주</label><select id="t-depositor" onchange="tUpdateDepositorBal()"></select></div>
+            <div class="form-row-s"><label class="form-label-s">예금주 현재 잔액</label><input id="t-depositor-bal" type="text" readonly></div>
+            <div class="form-row-s"><label class="form-label-s">납입 원금 (원)</label><input id="t-principal" type="number" min="0" placeholder="0" oninput="tUpdateCalc()"></div>
+            <div class="form-row-s"><label class="form-label-s">기간</label>
+              <select id="t-days" onchange="tOnDaysChange()">
+                <option value="15">15일 (단기)</option>
+                <option value="30">30일 (1개월)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row-s">
+            <label class="form-label-s">이자율 <span id="t-rate-hint" style="font-size:11px;color:var(--muted)"></span></label>
+            <div class="rate-slider-box">
+              <div style="display:flex;align-items:flex-end;gap:10px;margin-bottom:8px">
+                <div><div class="rate-big" id="t-rate-display">5.0%</div><div class="rate-sub">현재 이자율</div></div>
+                <div style="flex:1;text-align:right"><div style="font-size:13px;color:var(--c2);font-weight:700" id="t-payout">납입 원금을 입력하세요</div><div class="rate-sub">만기 수령 예상액</div></div>
+              </div>
+              <input type="range" class="rate-slider" id="t-rate-slider" min="0" max="50" step="0.5" value="5" oninput="tOnRateSlider(this.value)">
+              <div class="rate-tick-labels"><span>0%</span><span>10%</span><span>20%</span><span>30%</span><span>40%</span><span>50%</span></div>
+              <div class="rate-presets">
+                <span class="rate-preset-lbl">빠른 선택:</span>
+                <button class="rate-preset-btn" onclick="tSetRate(0)">0%</button>
+                <button class="rate-preset-btn" onclick="tSetRate(3)">3%</button>
+                <button class="rate-preset-btn" onclick="tSetRate(5)">5%</button>
+                <button class="rate-preset-btn" onclick="tSetRate(7)">7%</button>
+                <button class="rate-preset-btn" onclick="tSetRate(10)">10%</button>
+                <button class="rate-preset-btn" onclick="tSetRate(15)">15%</button>
+                <button class="rate-preset-btn" onclick="tSetRate(20)">20%</button>
+                <button class="rate-preset-btn" onclick="tSetRate(30)">30%</button>
+              </div>
+            </div>
+          </div>
+          <button class="btn" style="background:#d97706;color:#fff;border-color:#d97706" onclick="doTeacherCreateSaving()"><i class="ti ti-coin"></i> 즉시 개설</button>
+          <p style="font-size:11px;color:var(--muted);margin-top:6px"><i class="ti ti-info-circle"></i> 교사가 직접 개설한 적금은 즉시 진행됩니다. (잔액 즉시 차감)</p>
+          <div class="msg-box" id="t-saving-msg"></div>
+        </div>
+        <div class="card" style="border:1.5px solid var(--cy)">
+          <div class="card-title"><i class="ti ti-clock"></i>
+            승인 대기 <span id="savings-pending-badge" class="badge badge-yellow" style="display:none"></span>
+          </div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:10px">은행직원이 신청한 적금입니다. 승인하면 즉시 잔액이 차감되고 적금이 시작됩니다.</p>
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>예금주</th><th>원금</th><th>이자율</th><th>기간</th><th>신청일</th><th>만기예정</th><th>예상이자</th><th>신청 은행직원</th><th>처리</th></tr></thead>
+            <tbody id="savings-pending-table"></tbody>
+          </table></div>
+        </div>
+
+        <!-- 진행 중 -->
+        <div class="card">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span><i class="ti ti-activity" style="color:var(--c2)"></i> 진행 중</span>
+            <button class="btn btn-sm btn-green" onclick="doProcessMature()"><i class="ti ti-refresh"></i> 만기 처리</button>
+          </div>
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>예금주</th><th>원금</th><th>이자율</th><th>기간</th><th>시작일</th><th>만기일</th><th>예상이자</th><th>상태</th><th>관리</th></tr></thead>
+            <tbody id="savings-active-table"></tbody>
+          </table></div>
+        </div>
+
+        <!-- 완료 -->
+        <div class="card">
+          <div class="card-title"><i class="ti ti-history"></i>완료 내역</div>
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>예금주</th><th>원금</th><th>이자율</th><th>기간</th><th>시작일</th><th>만기일</th><th>지급액</th><th>상태</th></tr></thead>
+            <tbody id="savings-done-table"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- ★ 은행 모드 -->
+      <div class="page" id="page-bank-mode">
+        <div class="page-title"><i class="ti ti-building-bank"></i><span id="bank-mode-title">은행 창구</span></div>
+        <div class="card" style="border:1.5px solid #d97706">
+          <div class="card-title"><i class="ti ti-coin"></i>적금 개설</div>
+          <div class="form-grid">
+            <div class="form-row-s"><label class="form-label-s">예금주 (학생 선택)</label><select id="bank-depositor" onchange="updateBankDepositorBalance()"></select></div>
+            <div class="form-row-s"><label class="form-label-s">예금주 현재 잔액</label><input id="bank-depositor-bal" type="text" readonly></div>
+            <div class="form-row-s"><label class="form-label-s">납입 원금 (원)</label><input id="bank-principal" type="number" min="0" placeholder="0" oninput="updateBankCalc()"></div>
+            <div class="form-row-s"><label class="form-label-s">기간 선택</label>
+              <select id="bank-days" onchange="updateBankCalc()">
+                <option value="15">15일 (단기)</option>
+                <option value="30">30일 (1개월)</option>
+              </select>
+            </div>
+            <!-- 이자율 슬라이더 -->
+          <div class="form-row-s"><label class="form-label-s">이자율 선택 <span id="bank-rate-hint" style="font-size:11px;color:var(--muted)"></span></label>
+            <div class="rate-slider-box">
+              <div style="display:flex;align-items:flex-end;gap:10px;margin-bottom:8px">
+                <div><div class="rate-big" id="rate-big-display">5.0%</div><div class="rate-sub">현재 이자율</div></div>
+                <div style="flex:1;text-align:right"><div style="font-size:13px;color:var(--c2);font-weight:700" id="bank-payout">-</div><div class="rate-sub">만기 수령 예상액</div></div>
+              </div>
+              <input type="range" class="rate-slider" id="bank-rate-slider" min="0" max="50" step="0.5" value="5" oninput="onRateSliderInput(this.value)">
+              <div class="rate-tick-labels"><span>0%</span><span>10%</span><span>20%</span><span>30%</span><span>40%</span><span>50%</span></div>
+              <div class="rate-presets">
+                <span class="rate-preset-lbl">빠른 선택:</span>
+                <button class="rate-preset-btn" onclick="setRatePreset(0)">0%</button>
+                <button class="rate-preset-btn" onclick="setRatePreset(3)">3%</button>
+                <button class="rate-preset-btn" onclick="setRatePreset(5)">5%</button>
+                <button class="rate-preset-btn" onclick="setRatePreset(7)">7%</button>
+                <button class="rate-preset-btn" onclick="setRatePreset(10)">10%</button>
+                <button class="rate-preset-btn" onclick="setRatePreset(15)">15%</button>
+                <button class="rate-preset-btn" onclick="setRatePreset(20)">20%</button>
+                <button class="rate-preset-btn" onclick="setRatePreset(30)">30%</button>
+              </div>
+            </div>
+          </div>
+
+          </div>
+          <div style="background:#fef9c3;border:1px solid #f59e0b;border-radius:8px;padding:10px;font-size:12px;color:#92400e;margin-bottom:12px">
+            <i class="ti ti-info-circle"></i> 신청 후 <strong>교사 승인 시</strong> 잔액이 차감되고 적금이 시작됩니다. 만기일에 원리금이 자동 지급됩니다.
+          </div>
+          <button class="btn" style="background:#d97706;color:#fff;border-color:#d97706" onclick="doCreateSaving()"><i class="ti ti-plus"></i> 적금 개설</button>
+          <div class="msg-box" id="bank-create-msg"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-list"></i>내가 개설한 적금</div>
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>예금주</th><th>원금</th><th>이자율</th><th>기간</th><th>시작일</th><th>만기일</th><th>예상이자</th><th>상태</th></tr></thead>
+            <tbody id="bank-my-savings"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- ★ 화면 설정 -->
+      <div class="page" id="page-settings">
+        <div class="page-title"><i class="ti ti-palette"></i>화면 설정</div>
+
+        <!-- 미리보기 -->
+        <div class="card">
+          <div class="card-title"><i class="ti ti-eye"></i>미리보기</div>
+          <div id="preview-bg" style="display:flex;justify-content:center;padding:24px 12px;background:linear-gradient(135deg,#1340a8 0%,#1a56db 55%,#3b82f6 100%);border-radius:10px">
+            <div style="width:100%;max-width:320px">
+              <div style="text-align:center;color:#fff;margin-bottom:18px">
+                <div id="preview-logo-wrap" style="margin-bottom:6px"><i class="ti ti-building-bank" style="font-size:40px;opacity:.9"></i></div>
+                <div id="preview-title" style="font-size:18px;font-weight:700;letter-spacing:-.3px">교실 경제 시스템</div>
+                <div id="preview-subtitle" style="font-size:12px;opacity:.72;margin-top:4px">우리 반 경제를 함께 운영해요</div>
+              </div>
+              <div style="background:#fff;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;background:#f0f2f7;border-radius:7px;padding:3px;gap:3px">
+                  <div style="flex:1;text-align:center;padding:7px;background:#fff;border-radius:5px;font-size:12px;color:var(--c1);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.1)">학생 로그인</div>
+                  <div style="flex:1;text-align:center;padding:7px;font-size:12px;color:var(--muted)">교사 로그인</div>
+                </div>
+                <div style="height:36px;background:var(--c1l);border-radius:7px;border:1.5px solid var(--c1l)"></div>
+                <div style="height:36px;background:var(--c1l);border-radius:7px;border:1.5px solid var(--c1l)"></div>
+                <div style="height:36px;background:var(--c1);border-radius:7px;display:flex;align-items:center;justify-content:center">
+                  <span style="color:#fff;font-size:12px;font-weight:600">로그인</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 제목 설정 -->
+        <div class="card">
+          <div class="card-title"><i class="ti ti-typography"></i>제목 설정</div>
+          <div class="form-row-s"><label class="form-label-s">메인 제목</label><input id="cfg-title" type="text" placeholder="예) 6학년 3반 학급경제시스템" maxlength="30" oninput="updateSettingsPreview()"></div>
+          <div class="form-row-s"><label class="form-label-s">부제목</label><input id="cfg-subtitle" type="text" placeholder="예) 3반과 함께하는 경제 교실" maxlength="40" oninput="updateSettingsPreview()"></div>
+        </div>
+
+        <!-- 로고 설정 -->
+        <div class="card">
+          <div class="card-title"><i class="ti ti-photo"></i>로고 설정</div>
+          <div class="form-row-s">
+            <label class="form-label-s">로고 종류</label>
+            <div class="radio-row">
+              <label><input type="radio" name="cfg-logo-type" value="default" onchange="onCfgLogoTypeChange()"><span>기본 아이콘</span></label>
+              <label><input type="radio" name="cfg-logo-type" value="emoji" onchange="onCfgLogoTypeChange()"><span>이모지</span></label>
+              <label><input type="radio" name="cfg-logo-type" value="url" onchange="onCfgLogoTypeChange()"><span>이미지 URL</span></label>
+            </div>
+          </div>
+
+          <div id="cfg-emoji-wrap" style="display:none">
+            <label class="form-label-s">이모지 선택</label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+              <button onclick="pickEmoji('🏫')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="🏫">🏫</button>
+              <button onclick="pickEmoji('🏦')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="🏦">🏦</button>
+              <button onclick="pickEmoji('💰')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="💰">💰</button>
+              <button onclick="pickEmoji('📚')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="📚">📚</button>
+              <button onclick="pickEmoji('🌟')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="🌟">🌟</button>
+              <button onclick="pickEmoji('🎓')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="🎓">🎓</button>
+              <button onclick="pickEmoji('🏆')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="🏆">🏆</button>
+              <button onclick="pickEmoji('✨')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="✨">✨</button>
+              <button onclick="pickEmoji('🍎')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="🍎">🍎</button>
+              <button onclick="pickEmoji('🦁')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="🦁">🦁</button>
+              <button onclick="pickEmoji('🐯')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="🐯">🐯</button>
+              <button onclick="pickEmoji('🦊')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="🦊">🦊</button>
+              <button onclick="pickEmoji('🌈')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="🌈">🌈</button>
+              <button onclick="pickEmoji('🚀')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="🚀">🚀</button>
+              <button onclick="pickEmoji('🎨')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="🎨">🎨</button>
+              <button onclick="pickEmoji('⭐')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="⭐">⭐</button>
+              <button onclick="pickEmoji('🌻')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="🌻">🌻</button>
+              <button onclick="pickEmoji('🎪')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="🎪">🎪</button>
+              <button onclick="pickEmoji('🦋')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="🦋">🦋</button>
+              <button onclick="pickEmoji('🔑')" style="font-size:26px;padding:6px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;transition:border-color .12s" title="🔑">🔑</button>
+            </div>
+            <div class="form-row-s"><label class="form-label-s">직접 입력 (이모지 붙여넣기)</label><input id="cfg-emoji" type="text" placeholder="이모지를 여기에 붙여넣기" style="max-width:160px" oninput="updateSettingsPreview()"></div>
+          </div>
+
+          <div id="cfg-url-wrap" style="display:none">
+            <div class="form-row-s">
+              <label class="form-label-s">이미지 URL</label>
+              <input id="cfg-logo-url" type="text" placeholder="https://... 또는 구글 드라이브 공유 링크" oninput="updateSettingsPreview()">
+              <p style="font-size:11px;color:var(--muted);margin-top:5px">
+                <i class="ti ti-info-circle"></i>
+                구글 드라이브 → 파일 우클릭 → 공유 → 링크 복사 → 여기에 붙여넣기<br>
+                링크가 자동으로 이미지 직접 링크로 변환됩니다.
+              </p>
+            </div>
+          </div>
+
+          <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="doSaveSettings()"><i class="ti ti-device-floppy"></i> 저장 및 적용</button>
+            <button class="btn" onclick="doResetSettings()"><i class="ti ti-refresh"></i> 기본값으로 초기화</button>
+          </div>
+          <div class="msg-box" id="settings-msg"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="ti ti-palette"></i>테마 색상</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:12px">로그인 화면 배경과 상단바, 버튼 색상이 함께 바뀝니다.</p>
+          <div id="theme-picker" style="display:flex;gap:10px;flex-wrap:wrap"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="ti ti-palette"></i>아이콘 색상</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:12px">
+            메뉴와 제목 옆 아이콘 색을 바꿉니다. 테마 색을 따르게 하거나 원하는 색을 직접 고를 수 있어요.
+          </p>
+          <div id="icon-picker" style="display:flex;gap:10px;flex-wrap:wrap"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="ti ti-refresh"></i>데이터 점검</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:12px">
+            거래내역의 '월' 값이 실제 거래 날짜와 다르게 저장된 경우 바로잡습니다.
+            그래프의 월이 실제와 어긋나 보일 때 한 번 실행해 주세요.
+          </p>
+          <button class="btn btn-primary" onclick="doRepairMonths()"><i class="ti ti-refresh"></i> 거래내역 월 바로잡기</button>
+          <div class="msg-box" id="repair-msg"></div>
+        </div>
+      </div>
+
+      <!-- 상점지기 화면 -->
+      <div class="page" id="page-sk-store">
+        <div class="page-title"><i class="ti ti-shopping-cart"></i><span id="sk-store-title">내 상점</span></div>
+        <div class="card purple-card">
+          <div class="card-title"><i class="ti ti-shopping-bag"></i>판매 처리</div>
+          <div class="form-grid">
+            <div class="form-row-s"><label class="form-label-s">구매 학생</label><select id="sk-buy-student"></select></div>
+            <div class="form-row-s"><label class="form-label-s">물품</label><select id="sk-buy-item" onchange="skUpdatePrice()"></select></div>
+            <div class="form-row-s"><label class="form-label-s">수량</label><input id="sk-buy-qty" type="number" value="1" min="1" oninput="skUpdatePrice()"></div>
+            <div class="form-row-s"><label class="form-label-s">결제 금액</label><input id="sk-buy-price" type="number" readonly></div>
+          </div>
+          <button class="btn btn-purple" onclick="skDoBuy()"><i class="ti ti-shopping-bag"></i> 판매하기</button>
+          <div class="msg-box" id="sk-buy-msg"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-list"></i>재고 현황</div>
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>물품명</th><th>카테고리</th><th>가격</th><th>남은 재고</th><th>상태</th></tr></thead>
+            <tbody id="sk-stock-view"></tbody>
+          </table></div>
+        </div>
+        <div class="card purple-card" id="sk-price-section" style="display:none">
+          <div class="card-title"><i class="ti ti-tag"></i>가격 변경</div>
+          <div id="sk-price-list"></div><div class="msg-box" id="sk-price-msg"></div>
+        </div>
+        <div class="card purple-card" id="sk-stock-section" style="display:none">
+          <div class="card-title"><i class="ti ti-package"></i>재고 관리</div>
+          <div id="sk-stock-list"></div><div class="msg-box" id="sk-stock-msg"></div>
+        </div>
+        <div class="card purple-card" id="sk-full-section" style="display:none">
+          <div class="card-title"><i class="ti ti-settings"></i>물품 관리</div>
+          <div class="toolbar"><button class="btn btn-purple btn-sm" onclick="openItemModal(-1,true)"><i class="ti ti-plus"></i> 추가</button></div>
+          <div class="tbl-wrap"><table class="tbl"><thead><tr><th>물품명</th><th>카테고리</th><th>가격</th><th>재고</th><th>관리</th></tr></thead><tbody id="sk-full-table"></tbody></table></div>
+          <div class="msg-box" id="sk-full-msg"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-receipt"></i>오늘 판매 내역</div>
+          <div class="tbl-wrap"><table class="tbl"><thead><tr><th>날짜</th><th>구매학생</th><th>물품</th><th>금액</th></tr></thead><tbody id="sk-ledger-today"></tbody></table></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ── 모달들 ── -->
+<div class="modal-bg" id="modal-bonus"><div class="modal" style="width:560px">
+  <div class="modal-title"><i class="ti ti-gift"></i>보너스 지급</div>
+
+  <div class="form-grid">
+    <div class="form-row-s"><label class="form-label-s">1인당 지급 금액 (원)</label>
+      <input id="bonus-amount" type="number" min="0" placeholder="0" oninput="updateBonusSummary()"></div>
+    <div class="form-row-s"><label class="form-label-s">빠른 선택</label>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="btn btn-sm" onclick="setBonusAmount(500)">500</button>
+        <button class="btn btn-sm" onclick="setBonusAmount(1000)">1,000</button>
+        <button class="btn btn-sm" onclick="setBonusAmount(2000)">2,000</button>
+        <button class="btn btn-sm" onclick="setBonusAmount(5000)">5,000</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-row-s"><label class="form-label-s">지급 사유</label>
+    <input id="bonus-reason" type="text" placeholder="예) 학급 청소 우수, 발표 잘함" maxlength="60" list="bonus-presets">
+    <datalist id="bonus-presets">
+      <option value="수업 태도 우수"><option value="발표 잘함"><option value="친구 도와줌">
+      <option value="청소 열심히 함"><option value="과제 성실"><option value="학급 행사 기여">
+      <option value="독서 활동 우수"><option value="지각 없음">
+    </datalist>
+  </div>
+
+  <div style="background:var(--c1l);border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span>선택 인원</span><strong id="bonus-count">0명</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span>지급 총액</span><strong id="bonus-total" style="color:var(--c1d)">0원</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;border-top:1px solid rgba(0,0,0,.08);padding-top:6px;margin-top:6px">
+      <span>지급 후 금고</span><strong id="bonus-after">0원</strong>
+    </div>
+  </div>
+
+  <div class="toolbar" style="margin-bottom:8px">
+    <button class="btn btn-sm" onclick="bonusSelectAll(true)"><i class="ti ti-check"></i> 전체 선택</button>
+    <button class="btn btn-sm" onclick="bonusSelectAll(false)">전체 해제</button>
+    <span style="font-size:11px;color:var(--muted);margin-left:auto" id="bonus-warn"></span>
+  </div>
+
+  <div style="max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:8px">
+    <table class="tbl">
+      <thead><tr><th style="width:44px"></th><th>학생</th><th>직업</th><th>현재 잔액</th></tr></thead>
+      <tbody id="bonus-list"></tbody>
+    </table>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn" onclick="closeModal('modal-bonus')">취소</button>
+    <button class="btn btn-primary" id="bonus-pay-btn" onclick="doPayBonus()"><i class="ti ti-gift"></i> 보너스 지급</button>
+  </div>
+</div></div>
+
+<div class="modal-bg" id="modal-salary"><div class="modal" style="width:560px">
+  <div class="modal-title"><i class="ti ti-cash"></i><span id="sal-modal-title">급여 지급</span></div>
+
+  <div style="background:var(--c1l);border-radius:8px;padding:12px;margin-bottom:14px;font-size:13px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span>선택 인원</span><strong id="sal-count">0명</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span>지급 총액</span><strong id="sal-total" style="color:var(--c1d)">0원</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span>학급 금고</span><strong id="sal-treasury">0원</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;border-top:1px solid rgba(0,0,0,.08);padding-top:6px;margin-top:6px">
+      <span>지급 후 금고</span><strong id="sal-after">0원</strong>
+    </div>
+  </div>
+
+  <div class="toolbar" style="margin-bottom:8px">
+    <button class="btn btn-sm" onclick="salSelectAll(true)"><i class="ti ti-check"></i> 전체 선택</button>
+    <button class="btn btn-sm" onclick="salSelectAll(false)">전체 해제</button>
+    <span style="font-size:11px;color:var(--muted);margin-left:auto" id="sal-warn"></span>
+  </div>
+
+  <div style="max-height:320px;overflow-y:auto;border:1px solid var(--border);border-radius:8px">
+    <table class="tbl">
+      <thead><tr><th style="width:44px"></th><th>학생</th><th>직업</th><th>급여</th></tr></thead>
+      <tbody id="sal-list"></tbody>
+    </table>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn" onclick="closeModal('modal-salary')">취소</button>
+    <button class="btn btn-primary" id="sal-pay-btn" onclick="doPaySelected()"><i class="ti ti-cash"></i> 지급하기</button>
+  </div>
+</div></div>
+
+<div class="modal-bg" id="modal-student"><div class="modal">
+  <div class="modal-title"><i class="ti ti-user"></i><span id="s-modal-title">학생 추가</span></div>
+  <div class="form-row-s"><label class="form-label-s">출석 번호</label><input id="s-num" type="number" placeholder="번호"></div>
+  <div class="form-row-s"><label class="form-label-s">이름</label><input id="s-name" type="text" placeholder="학생 이름"></div>
+  <div class="form-row-s"><label class="form-label-s">초기 잔액 (최초 지급액)</label><input id="s-balance" type="number" value="0">
+    <p style="font-size:11px;color:var(--muted);margin-top:5px"><i class="ti ti-info-circle"></i> 현재 잔액 = 초기 잔액 + 이후 모든 거래 내역</p></div>
+  <input type="hidden" id="s-idx" value="-1">
+  <div class="modal-footer"><button class="btn" onclick="closeModal('modal-student')">취소</button><button class="btn btn-primary" onclick="doSaveStudent()">저장</button></div>
+</div></div>
+
+<div class="modal-bg" id="modal-balance"><div class="modal">
+  <div class="modal-title"><i class="ti ti-coins"></i>잔액 조정</div>
+  <p id="bal-info" style="font-size:13px;color:var(--muted);margin-bottom:12px"></p>
+  <div class="form-row-s"><label class="form-label-s">변경 금액 (음수=차감)</label><input id="bal-amount" type="number" placeholder="예: 1000 또는 -500"></div>
+  <div class="form-row-s"><label class="form-label-s">메모</label><input id="bal-memo" type="text" placeholder="사유"></div>
+  <input type="hidden" id="bal-idx">
+  <div class="modal-footer"><button class="btn" onclick="closeModal('modal-balance')">취소</button><button class="btn btn-primary" onclick="doAdjustBalance()">확인</button></div>
+</div></div>
+
+<div class="modal-bg" id="modal-job"><div class="modal">
+  <div class="modal-title"><i class="ti ti-briefcase"></i><span id="j-modal-title">직업 추가</span></div>
+  <div class="form-row-s"><label class="form-label-s">직업명</label><input id="j-name" type="text"></div>
+  <div class="form-row-s"><label class="form-label-s">기본 급여 (1회 지급액)</label><input id="j-salary" type="number"></div>
+  <div class="form-row-s"><label class="form-label-s">최대 인원</label>
+    <div class="slot-ctrl"><button class="btn btn-sm" onclick="changeSlot(-1)">−</button><span id="j-slots-disp">1</span><button class="btn btn-sm" onclick="changeSlot(1)">+</button><input type="hidden" id="j-slots" value="1"></div></div>
+  <div class="form-row-s"><label class="form-label-s">설명</label><input id="j-desc" type="text"></div>
+  <input type="hidden" id="j-idx" value="-1">
+  <div class="modal-footer"><button class="btn" onclick="closeModal('modal-job')">취소</button><button class="btn btn-primary" onclick="doSaveJob()">저장</button></div>
+</div></div>
+
+<div class="modal-bg" id="modal-item"><div class="modal">
+  <div class="modal-title"><i class="ti ti-package"></i><span id="it-modal-title">물품 추가</span></div>
+  <div class="form-row-s"><label class="form-label-s">물품명</label><input id="it-name" type="text"></div>
+  <div class="form-grid">
+    <div class="form-row-s" style="margin:0"><label class="form-label-s">가격</label><input id="it-price" type="number"></div>
+    <div class="form-row-s" style="margin:0"><label class="form-label-s">재고 (-1=무제한)</label><input id="it-stock" type="number" value="-1"></div>
+  </div>
+  <div class="form-row-s" style="margin-top:12px"><label class="form-label-s">카테고리</label>
+    <input id="it-category" type="text" list="cat-list"><datalist id="cat-list"><option value="간식"><option value="특권"><option value="문구"><option value="기타"></datalist></div>
+  <div class="form-row-s"><label class="form-label-s">설명</label><input id="it-desc" type="text"></div>
+
+  <div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px;background:#fafbff">
+    <label class="radio-row" style="cursor:pointer;margin-bottom:8px">
+      <input type="checkbox" id="it-auto" onchange="onAutoRefillToggle()">
+      <span style="font-size:13px;font-weight:600">매일 자정 자동 리필</span>
+    </label>
+    <div id="it-refill-box" style="display:none">
+      <label class="form-label-s">매일 채울 수량</label>
+      <input id="it-refill-qty" type="number" min="1" value="1" style="max-width:140px">
+      <p style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.6">
+        재고가 이 수량보다 적으면 매일 자정에 이만큼 채웁니다.<br>
+        예) 1로 두면 하루에 1개만 판매됩니다.
+      </p>
+    </div>
+  </div>
+
+  <input type="hidden" id="it-idx" value="-1"><input type="hidden" id="it-as-sk" value="0">
+  <div class="modal-footer"><button class="btn" onclick="closeModal('modal-item')">취소</button><button class="btn btn-primary" onclick="doSaveItem()">저장</button></div>
+</div></div>
+
+<div class="modal-bg" id="modal-perm"><div class="modal">
+  <div class="modal-title"><i class="ti ti-shield-check" style="color:var(--cp)"></i><span id="perm-modal-title">권한 추가</span></div>
+  <div class="form-row-s"><label class="form-label-s">직업</label><select id="perm-job"></select></div>
+  <div class="form-row-s"><label class="form-label-s">카테고리</label>
+    <input id="perm-cat" type="text" placeholder="전체" list="cat-list2"><datalist id="cat-list2"><option value="전체"><option value="간식"><option value="특권"><option value="문구"></datalist></div>
+  <div class="form-row-s"><label class="form-label-s">권한</label>
+    <select id="perm-type"><option value="판매">판매</option><option value="가격변경">가격변경</option><option value="재고관리">재고관리</option><option value="전체관리">전체관리</option></select></div>
+  <input type="hidden" id="perm-idx" value="-1">
+  <div class="modal-footer"><button class="btn" onclick="closeModal('modal-perm')">취소</button><button class="btn btn-purple" onclick="doSavePerm()">저장</button></div>
+</div></div>
+
+
+<div class="modal-bg" id="modal-bankperm"><div class="modal">
+  <div class="modal-title"><i class="ti ti-building-bank" style="color:#d97706"></i><span id="bankperm-modal-title">은행 권한 추가</span></div>
+  <div class="form-row-s"><label class="form-label-s">직업</label><select id="bankperm-job"></select></div>
+  <div class="form-row-s"><label class="form-label-s">역할</label>
+    <select id="bankperm-role"><option value="은행직원">은행직원</option><option value="은행장">은행장</option></select></div>
+  <input type="hidden" id="bankperm-idx" value="-1">
+  <div class="modal-footer"><button class="btn" onclick="closeModal('modal-bankperm')">취소</button><button class="btn" style="background:#d97706;color:#fff;border-color:#d97706" onclick="doSaveBankPerm()">저장</button></div>
+</div></div>
+
+<div class="modal-bg" id="modal-bank-login"><div class="modal">
+  <div class="modal-title"><i class="ti ti-building-bank" style="color:#d97706"></i>은행 모드 진입</div>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:14px">은행 권한을 가진 학생의 출석번호를 입력하세요.</p>
+  <div class="form-row-s"><label class="form-label-s">출석 번호</label><input id="bank-login-num" type="number" onkeydown="if(event.key==='Enter')doBankLogin()"></div>
+  <div class="msg-box" id="bank-login-msg"></div>
+  <div class="modal-footer"><button class="btn" onclick="closeModal('modal-bank-login')">취소</button><button class="btn" style="background:#d97706;color:#fff;border-color:#d97706" onclick="doBankLogin()">입장</button></div>
+</div></div>
+<div class="modal-bg" id="modal-sk-login"><div class="modal">
+  <div class="modal-title"><i class="ti ti-shopping-cart" style="color:var(--cp)"></i>상점지기 모드 진입</div>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:14px">상점 권한을 가진 학생의 출석번호를 입력하세요.</p>
+  <div class="form-row-s"><label class="form-label-s">출석 번호</label><input id="sk-login-num" type="number" onkeydown="if(event.key==='Enter')doSkLogin()"></div>
+  <div class="msg-box" id="sk-login-msg"></div>
+  <div class="modal-footer"><button class="btn" onclick="closeModal('modal-sk-login')">취소</button><button class="btn btn-purple" onclick="doSkLogin()">입장</button></div>
+</div></div>
+
+<script src="js/api.js?v=2.0.0"></script>
+<script src="js/app.js?v=2.0.0"></script>
+</body>
+</html>
