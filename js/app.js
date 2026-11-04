@@ -562,6 +562,12 @@ function showPage(id) {
     var _n$getAttribute;
     if ((_n$getAttribute = n.getAttribute('onclick')) !== null && _n$getAttribute !== void 0 && _n$getAttribute.includes("'".concat(id, "'"))) n.classList.add('active');
   });
+  // 상단바 왼쪽에 지금 보고 있는 메뉴 이름을 띄웁니다.
+  try {
+    var cur = document.querySelector('.nav-item.active span');
+    var crumb = document.getElementById('topbar-page');
+    if (cur && crumb) crumb.textContent = cur.textContent;
+  } catch (e) {}
   (_dashboard$charts$stu = (_dashboard$charts$stu2 = {
     dashboard: renderDashboard,
     charts: renderCharts,
@@ -616,7 +622,20 @@ function renderDashboard() {
     }).reduce(function (s, l) {
       return s + Math.abs(l.amount);
     }, 0);
-  document.getElementById('dash-stats').innerHTML = "<div class=\"stat\" style=\"border-color:var(--c2);border-width:1.5px\"><div class=\"stat-label\">\uD559\uAE09 \uAE08\uACE0</div><div class=\"stat-value green\">".concat(fmt(S.treasuryBalance || 0), "</div></div><div class=\"stat\"><div class=\"stat-label\">\uCD1D \uC720\uD1B5 \uD654\uD3D0</div><div class=\"stat-value blue\">").concat(fmt(total), "</div></div><div class=\"stat\"><div class=\"stat-label\">").concat(S.month, "\uC6D4 \uAE09\uC5EC</div><div class=\"stat-value green\">").concat(fmt(salary), "</div></div><div class=\"stat\"><div class=\"stat-label\">").concat(S.month, "\uC6D4 \uC138\uAE08</div><div class=\"stat-value red\">").concat(fmt(tax), "</div></div><div class=\"stat\"><div class=\"stat-label\">").concat(S.month, "\uC6D4 \uBB3C\uD488\uC9C0\uCD9C</div><div class=\"stat-value yellow\">").concat(fmt(shop), "</div></div><div class=\"stat\"><div class=\"stat-label\">\uD559\uC0DD \uC218</div><div class=\"stat-value\">").concat(S.students.length, "\uBA85</div></div>");
+  function tile(label, value, cls, note, featured) {
+    return '<div class="stat' + (featured ? ' featured' : '') + '">'
+      + '<div class="stat-label">' + label + '</div>'
+      + '<div class="stat-value ' + (cls || '') + '">' + value + '</div>'
+      + (note ? '<span class="stat-note">' + note + '</span>' : '')
+      + '</div>';
+  }
+  document.getElementById('dash-stats').innerHTML =
+      tile('\uD559\uAE09 \uAE08\uACE0', fmt(S.treasuryBalance || 0), 'green', '\uC138\uAE08\uACFC \uBB3C\uD488 \uB300\uAE08', true)
+    + tile('\uCD1D \uC720\uD1B5 \uD654\uD3D0', fmt(total), 'blue', '\uC544\uC774\uB4E4 \uD1B5\uC7A5 \uD569\uACC4')
+    + tile(S.month + '\uC6D4 \uAE09\uC5EC', fmt(salary), 'green', '\uC9C0\uAE09\uD55C \uAE08\uC561')
+    + tile(S.month + '\uC6D4 \uC138\uAE08', fmt(tax), 'red', '\uAC77\uC740 \uAE08\uC561')
+    + tile(S.month + '\uC6D4 \uBB3C\uD488\uC9C0\uCD9C', fmt(shop), 'yellow', '\uD559\uAE09 \uC0C1\uC810 \uC0AC\uC6A9')
+    + tile('\uCC38\uC5EC \uD559\uC0DD \uC218', S.students.length + '\uBA85', 'navy', '\uC804\uC6D0 \uACBD\uC81C\uD65C\uB3D9 \uC911');
   document.getElementById('dash-table').innerHTML = S.students.length ? S.students.map(function (s) {
     var jn = getJobName(s.num);
     var inc = mL.filter(function (l) {
@@ -629,7 +648,18 @@ function renderDashboard() {
       }).reduce(function (sm, l) {
         return sm + Math.abs(l.amount);
       }, 0);
-    return "<tr><td>".concat(s.num, "</td><td><strong>").concat(s.name, "</strong></td><td>").concat(jn ? "<span class=\"badge badge-blue\">".concat(jn, "</span>") : '<span class="badge badge-gray">미배정</span>', "</td><td><strong style=\"color:var(--c1)\">").concat(fmt(s.balance), "</strong></td><td style=\"color:var(--c2)\">+").concat(fmt(inc), "</td><td style=\"color:var(--cd)\">").concat(exp ? '-' + fmt(exp) : '-', "</td></tr>");
+    var badge = jn
+      ? '<span class="badge ' + jobBadgeClass(jn) + '">' + jn + '</span>'
+      : '<span class="badge badge-gray">미배정</span>';
+    return '<tr>'
+      + '<td style="color:#94a3b8;font-weight:800">' + s.num + '</td>'
+      + '<td><span class="name-cell"><span class="ava">' + String(s.name).charAt(0) + '</span>'
+        + s.name + '</span></td>'
+      + '<td>' + badge + '</td>'
+      + '<td class="num" style="color:#2563eb">' + fmt(s.balance) + '</td>'
+      + '<td class="num" style="color:var(--c2)">+' + fmt(inc) + '</td>'
+      + '<td class="num" style="color:var(--cd)">' + (exp ? '-' + fmt(exp) : '-') + '</td>'
+      + '</tr>';
   }).join('') : '<tr><td colspan="6" class="empty">학생이 없습니다</td></tr>';
 }
 function getSortedStudents() {
@@ -962,12 +992,67 @@ function renderInOutChart() {
     }
   });
 }
+/* 직업마다 다른 배지 색. 이름이 같으면 늘 같은 색이 나옵니다. */
+var JOB_BADGES = ['badge-yellow','badge-green','badge-blue','badge-purple',
+                  'badge-rose','badge-teal','badge-indigo','badge-orange'];
+function jobBadgeClass(name) {
+  if (!name) return 'badge-gray';
+  var h = 0;
+  for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) % 100000;
+  return JOB_BADGES[h % JOB_BADGES.length];
+}
+
 function renderStudents() {
+  // 검색창과 직업 필터 채우기
+  var selEl = document.getElementById('student-job-filter');
+  if (selEl) {
+    var keep = selEl.value;
+    var jobNames = [];
+    S.students.forEach(function (s) {
+      var j = getJobName(s.num);
+      if (j && jobNames.indexOf(j) < 0) jobNames.push(j);
+    });
+    selEl.innerHTML = '<option value="">직업 전체</option>' +
+      jobNames.map(function (j) { return '<option value="' + j + '">' + j + '</option>'; }).join('');
+    selEl.value = keep;
+  }
+
+  var qEl = document.getElementById('student-search');
+  var q = qEl ? qEl.value.trim() : '';
+  var jf = selEl ? selEl.value : '';
+
+  var rows = S.students.filter(function (s) {
+    var jn = getJobName(s.num) || '';
+    var hitQ = !q || String(s.name).indexOf(q) >= 0 || jn.indexOf(q) >= 0 || String(s.num) === q;
+    var hitJ = !jf || jn === jf;
+    return hitQ && hitJ;
+  });
+
+  var cnt = document.getElementById('student-count');
+  if (cnt) cnt.textContent = '(' + rows.length + '명'
+    + (rows.length !== S.students.length ? ' / 전체 ' + S.students.length + '명' : '') + ')';
+
   document.getElementById('student-empty').style.display = S.students.length ? 'none' : 'block';
-  document.getElementById('student-table').innerHTML = S.students.map(function (s, i) {
+  document.getElementById('student-table').innerHTML = rows.map(function (s) {
+    var i = S.students.indexOf(s);
     var jn = getJobName(s.num);
-    return "<tr><td>".concat(s.num, "</td><td><strong>").concat(s.name, "</strong></td><td>").concat(jn ? "<span class=\"badge badge-blue\">".concat(jn, "</span>") : '<span class="badge badge-gray">미배정</span>', "</td><td style=\"color:var(--c1);font-weight:600\">").concat(fmt(s.initial !== undefined ? s.initial : s.balance), "</td><td style=\"color:var(--c1);font-weight:600\">").concat(fmt(s.balance), "</td><td><div class=\"row-btns\"><button class=\"btn btn-sm\" onclick=\"openStudentModal(").concat(i, ")\"><i class=\"ti ti-edit\"></i></button><button class=\"btn btn-sm\" onclick=\"openBalanceModal(").concat(i, ")\"><i class=\"ti ti-coins\"></i></button><button class=\"btn btn-sm btn-danger\" onclick=\"doDeleteStudent(").concat(i, ")\"><i class=\"ti ti-trash\"></i></button></div></td></tr>");
-  }).join('') || '<tr><td colspan="6" class="empty">없음</td></tr>';
+    var badge = jn
+      ? '<span class="badge ' + jobBadgeClass(jn) + '">' + jn + '</span>'
+      : '<span class="badge badge-gray">미배정</span>';
+    return '<tr>'
+      + '<td style="color:#94a3b8;font-weight:800">' + s.num + '</td>'
+      + '<td><span class="name-cell"><span class="ava">' + String(s.name).charAt(0) + '</span>'
+        + s.name + '</span></td>'
+      + '<td>' + badge + '</td>'
+      + '<td class="num" style="color:#94a3b8">'
+        + fmt(s.initial !== undefined ? s.initial : s.balance) + '</td>'
+      + '<td class="num" style="color:#2563eb">' + fmt(s.balance) + '</td>'
+      + '<td><div class="row-btns">'
+        + '<button class="btn btn-sm" onclick="openStudentModal(' + i + ')"><i class="ti ti-edit"></i></button>'
+        + '<button class="btn btn-sm" onclick="openBalanceModal(' + i + ')"><i class="ti ti-coins"></i></button>'
+        + '<button class="btn btn-sm btn-danger" onclick="doDeleteStudent(' + i + ')"><i class="ti ti-trash"></i></button>'
+      + '</div></td></tr>';
+  }).join('') || '<tr><td colspan="6" class="empty">조건에 맞는 학생이 없습니다.</td></tr>';
 }
 function openStudentModal(i) {
   document.getElementById('s-modal-title').textContent = i === -1 ? '학생 추가' : '학생 수정';
@@ -3126,7 +3211,16 @@ function convertGDriveUrl(url) {
 }
 function applyLoginSettings(s) {
   if (!s) return;
-  document.getElementById('login-title-text').textContent = s.title || '돈워리!';
+  var titleTxt = s.title || '돈워리!';
+  var titleEl = document.getElementById('login-title-text');
+  titleEl.textContent = titleTxt;
+  // 반 이름을 따로 넣지 않은 경우에만 영문 이름을 함께 보여 줍니다.
+  if (titleTxt === '돈워리!') {
+    var en = document.createElement('span');
+    en.className = 'en';
+    en.textContent = "Don't Worry";
+    titleEl.appendChild(en);
+  }
   document.getElementById('login-subtitle-text').textContent = s.subtitle || '우리 반 경제를 함께 운영해요';
   var titleEls = [document.getElementById('app-title-admin'), document.getElementById('app-title-student')];
   titleEls.forEach(function (el) {
@@ -3955,6 +4049,14 @@ function tickClock() {
   if (a) a.textContent = txt;
   var b = document.getElementById('topbar-clock-student');
   if (b) b.textContent = txt;
+
+  // 사이드바 아래 날짜
+  var c = document.getElementById('sidebar-today');
+  if (c) c.textContent = (d.getMonth() + 1) + '월 ' + d.getDate() + '일 (' + days[d.getDay()] + ')';
+
+  // 사이드바 로고는 한 번만 그려 넣습니다.
+  var mk = document.getElementById('sidebar-mark');
+  if (mk && !mk.firstChild) mk.innerHTML = DW_MARK;
 }
 
 function startClock() {
