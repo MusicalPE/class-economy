@@ -4055,9 +4055,11 @@ function tickClock() {
   var c = document.getElementById('sidebar-today');
   if (c) c.textContent = (d.getMonth() + 1) + '월 ' + d.getDate() + '일 (' + days[d.getDay()] + ')';
 
-  // 사이드바 로고는 한 번만 그려 넣습니다.
-  var mk = document.getElementById('sidebar-mark');
-  if (mk && !mk.firstChild) mk.innerHTML = DW_MARK;
+  // 로고는 한 번만 그려 넣습니다. (교사 사이드바 / 학생 상단바)
+  ['sidebar-mark', 'student-mark'].forEach(function (id) {
+    var mk = document.getElementById(id);
+    if (mk && !mk.firstChild) mk.innerHTML = DW_MARK;
+  });
 }
 
 function startClock() {

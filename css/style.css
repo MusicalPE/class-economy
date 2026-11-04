@@ -443,10 +443,30 @@ input[readonly]{background:#f8fafc;color:var(--muted)}
    학생 화면
    ══════════════════════════════════════════════════════════ */
 #student-screen{min-height:100vh;background:var(--bg);display:none}
-.student-topbar{display:flex;align-items:center;gap:12px;padding:0 20px;height:58px;
+.student-topbar{display:flex;align-items:center;gap:14px;padding:0 18px;height:62px;
   background:var(--navy);color:#fff;box-shadow:0 2px 8px rgba(27,42,74,.2)}
 .student-topbar .topbar-logo i{color:var(--gold)}
-.student-main{max-width:740px;margin:0 auto;padding:26px 20px}
+/* 교사 화면 사이드바와 같은 로고 묶음 */
+.st-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.st-brand > span:first-child{display:flex;flex-shrink:0}
+.st-brand svg{width:38px;height:auto;filter:drop-shadow(0 3px 7px rgba(0,0,0,.3))}
+.st-brand .bt b{display:block;color:#fff;font-size:15px;font-weight:800;
+  letter-spacing:-.3px;line-height:1.15}
+.st-brand .bt span{display:block;color:var(--gold);font-size:10px;font-weight:600;
+  margin-top:2px;line-height:1.2}
+.student-topbar #topbar-clock-student{font-size:12px;opacity:.72;font-weight:600;
+  white-space:nowrap}
+
+.student-main{max-width:760px;margin:0 auto;padding:26px 20px}
+/* 넓은 화면에서는 두 칸으로 나눠 통장 상황이 한눈에 들어오게 합니다.
+   휴대폰·태블릿 세로 화면은 지금처럼 한 줄로 내려갑니다. */
+.st-grid{display:block}
+.st-col{display:block}
+@media(min-width:1080px){
+  .student-main{max-width:1180px}
+  .st-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:start}
+  .st-col > .card:last-child{margin-bottom:0}
+}
 .profile-card{background:linear-gradient(135deg,var(--navy) 0%,var(--board) 100%);color:#fff;
   border-radius:var(--radius);padding:24px;margin-bottom:18px;position:relative;overflow:hidden;
   box-shadow:0 8px 24px rgba(27,42,74,.26)}
