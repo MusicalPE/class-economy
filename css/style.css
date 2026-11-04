@@ -1,7 +1,8 @@
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#f0f2f7;--surface:#fff;--border:#e2e6ef;
-  --c1:#1a56db;--c1l:#e8f0fe;--c1d:#1340a8;
+  --c1:#1F3A5F;--c1l:#e8edf5;--c1d:#142942;
+  --gold:#F6C457;--gold-d:#D08C1C;--board:#2F5D4E;
   --c2:#0e9f6e;--c2l:#def7ec;--cd:#e3342f;--cdl:#fde8e8;
   --cy:#d97706;--cyl:#fef3c7;--cp:#7c3aed;--cpl:#ede9fe;
   --gray:#6b7280;--text:#111827;--muted:#6b7280;
@@ -10,13 +11,41 @@
 body{font-family:'Noto Sans KR',sans-serif;color:var(--text);font-size:14px}
 
 /* ── 로그인 화면 ── */
-#login-screen{min-height:100vh;background:linear-gradient(135deg,#1340a8 0%,#1a56db 50%,#3b82f6 100%);display:flex;align-items:center;justify-content:center;padding:20px}
+#login-screen{min-height:100vh;
+  background:
+    radial-gradient(900px 460px at 50% -8%, rgba(246,196,87,.18), transparent 62%),
+    linear-gradient(135deg,#15283F 0%,#1F3A5F 52%,#2E5D4E 100%);
+  display:flex;align-items:center;justify-content:center;padding:20px}
 .login-wrap{width:100%;max-width:400px}
-.login-logo{text-align:center;color:#fff;margin-bottom:28px}
+.login-logo{text-align:center;color:#fff;margin-bottom:26px}
 .login-logo i{font-size:48px;display:block;margin-bottom:8px;opacity:.9}
-.login-logo h1{font-size:22px;font-weight:700;letter-spacing:-.3px}
-.login-logo p{font-size:13px;opacity:.75;margin-top:4px}
-.login-card{background:#fff;border-radius:16px;padding:28px;box-shadow:0 12px 40px rgba(0,0,0,.2)}
+.login-logo svg{width:104px;height:auto;display:block;margin:0 auto 14px;
+  filter:drop-shadow(0 8px 18px rgba(0,0,0,.32))}
+.login-logo img{display:block;margin:0 auto 12px}
+.login-logo h1{font-size:25px;font-weight:700;letter-spacing:-.4px;
+  text-shadow:0 2px 10px rgba(0,0,0,.22)}
+.login-logo p{font-size:13px;opacity:.72;margin-top:5px}
+.login-card{background:#fff;border-radius:18px;padding:28px;position:relative;overflow:hidden;
+  box-shadow:0 18px 48px rgba(0,0,0,.26),0 2px 8px rgba(0,0,0,.12)}
+.login-card::before{content:'';position:absolute;left:0;right:0;top:0;height:4px;
+  background:linear-gradient(90deg,var(--gold-d),var(--gold) 45%,var(--gold-d))}
+
+/* ── 초기 비밀번호 알림 ── */
+#dw-pw-notice{position:fixed;left:16px;right:16px;bottom:16px;z-index:9000;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  background:#1F3A5F;color:#fff;border:1px solid rgba(246,196,87,.5);
+  border-left:5px solid var(--gold);border-radius:12px;padding:14px 18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.28);font-size:13px;line-height:1.6}
+#dw-pw-notice .dw-pw-txt{flex:1;min-width:240px}
+#dw-pw-notice .dw-pw-txt strong{display:block;color:var(--gold);font-size:13.5px;margin-bottom:2px}
+#dw-pw-notice .dw-pw-txt span{opacity:.85}
+#dw-pw-notice button{border:0;border-radius:8px;padding:9px 15px;font-size:13px;
+  font-weight:700;font-family:inherit;cursor:pointer;flex:0 0 auto}
+#dw-pw-notice .dw-pw-go{background:var(--gold);color:#3A2B06}
+#dw-pw-notice .dw-pw-go:hover{background:#FFD472}
+#dw-pw-notice .dw-pw-later{background:rgba(255,255,255,.14);color:#fff}
+#dw-pw-notice .dw-pw-later:hover{background:rgba(255,255,255,.24)}
+@media(max-width:560px){#dw-pw-notice{left:10px;right:10px;bottom:10px}}
 .login-tabs{display:flex;background:#f0f2f7;border-radius:8px;padding:3px;margin-bottom:22px;gap:3px}
 .login-tab{flex:1;padding:8px;text-align:center;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;color:var(--muted);border:none;background:none;font-family:inherit;transition:all .15s}
 .login-tab.active{background:#fff;color:var(--c1);box-shadow:0 1px 4px rgba(0,0,0,.1)}

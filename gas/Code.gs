@@ -1,5 +1,5 @@
 // ============================================================
-//  교실 경제 시스템 - Code.gs
+//  돈워리! — Code.gs (라이브러리)
 // ============================================================
 
 const SHEET_NAMES = {
@@ -33,13 +33,13 @@ const APP_URL = 'https://musicalpe.github.io/class-economy/';
 function doGet(e, selfUrl) {
   const target = APP_URL + '?app=' + encodeURIComponent(selfUrl || '');
   const html =
-    '<!DOCTYPE html><meta charset="utf-8"><title>교실 경제 시스템</title>' +
+    '<!DOCTYPE html><meta charset="utf-8"><title>돈워리!</title>' +
     '<body style="font-family:sans-serif;padding:28px;color:#374151">' +
     '<p>화면을 여는 중입니다...</p>' +
     '<p><a href="' + target + '" target="_top">열리지 않으면 여기를 눌러 주세요</a></p>' +
     '<script>window.top.location.href=' + JSON.stringify(target) + ';<\/script>';
   return HtmlService.createHtmlOutput(html)
-    .setTitle('교실 경제 시스템')
+    .setTitle('돈워리!')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
@@ -732,11 +732,18 @@ function getLedger(filterType){
 // ════════════════════════════════════════════════════════════
 //  로그인 & 비밀번호 관리
 // ════════════════════════════════════════════════════════════
-function _getAdminPw(){return _props().getProperty('ADMIN_PW')||'admin1234';}
+// 처음 설치했을 때의 관리자 비밀번호.
+// 짧게 두는 대신, 이 비밀번호로 들어오면 화면에서 바꾸라고 알립니다.
+const DEFAULT_ADMIN_PW = '1234';
+function _getAdminPw(){return _props().getProperty('ADMIN_PW')||DEFAULT_ADMIN_PW;}
 function _setAdminPw(pw){_props().setProperty('ADMIN_PW',pw);}
 function _ensurePassword(studentNum,defaultPw){const sh=getSheet(SHEET_NAMES.PASSWORDS),rows=sheetToArray(SHEET_NAMES.PASSWORDS),ri=rows.findIndex(r=>String(r[0])===String(studentNum));if(ri<0)sh.appendRow([studentNum,defaultPw]);}
 function _getStoredPw(studentNum){const rows=sheetToArray(SHEET_NAMES.PASSWORDS),row=rows.find(r=>String(r[0])===String(studentNum));return row?String(row[1]):String(studentNum);}
-function verifyAdminLogin(pw){return{ok:pw===_getAdminPw()};}
+function verifyAdminLogin(pw){
+  const ok = pw===_getAdminPw();
+  // 아직 초기 비밀번호를 쓰고 있으면 화면에서 안내하도록 알려 줍니다.
+  return {ok:ok, isDefault: ok && _getAdminPw()===DEFAULT_ADMIN_PW};
+}
 function verifyStudentLogin(studentNum,password){
   try{
     const students=getStudents();
@@ -824,7 +831,12 @@ function getAllPasswords(){
 function setStudentPwAdmin(studentNum,newPw){const sh=getSheet(SHEET_NAMES.PASSWORDS),rows=sheetToArray(SHEET_NAMES.PASSWORDS),ri=rows.findIndex(r=>String(r[0])===String(studentNum));if(ri>=0)sh.getRange(ri+2,2).setValue(newPw);else sh.appendRow([studentNum,newPw]);return{ok:true};}
 function resetStudentPw(studentNum){return setStudentPwAdmin(studentNum,String(studentNum));}
 function resetAllPasswords(){const students=getStudents();students.forEach(s=>setStudentPwAdmin(s.num,String(s.num)));return{ok:true,count:students.length};}
-function changeAdminPw(currentPw,newPw){if(currentPw!==_getAdminPw())return{ok:false,msg:'현재 비밀번호가 올바르지 않습니다.'};if(!newPw||newPw.length<4)return{ok:false,msg:'새 비밀번호는 4자리 이상이어야 합니다.'};_setAdminPw(newPw);return{ok:true};}
+function changeAdminPw(currentPw,newPw){
+  if(currentPw!==_getAdminPw())return{ok:false,msg:'현재 비밀번호가 올바르지 않습니다.'};
+  if(!newPw||newPw.length<4)return{ok:false,msg:'새 비밀번호는 4자리 이상이어야 합니다.'};
+  if(newPw===DEFAULT_ADMIN_PW)return{ok:false,msg:'초기 비밀번호와 같습니다. 다른 번호로 정해 주세요.'};
+  _setAdminPw(newPw);return{ok:true};
+}
 // 학생이 직접 비밀번호 변경 (승인 불필요)
 function changeStudentPwDirect(studentNum, currentPw, newPw, confirmPw) {
   if(newPw !== confirmPw) return {ok:false, msg:'새 비밀번호가 일치하지 않습니다.'};
@@ -992,11 +1004,11 @@ function cancelSavingEarly(idx){
 // ════════════════════════════════════════════════════════════
 function getLoginSettings(){
   const p=_props();
-  return{title:p.getProperty('LOGIN_TITLE')||'교실 경제 시스템',subtitle:p.getProperty('LOGIN_SUBTITLE')||'우리 반 경제를 함께 운영해요',logoType:p.getProperty('LOGIN_LOGO_TYPE')||'default',emoji:p.getProperty('LOGIN_EMOJI')||'',logoUrl:p.getProperty('LOGIN_LOGO_URL')||'',theme:p.getProperty('APP_THEME')||'blue',iconColor:p.getProperty('APP_ICON')||'theme'};
+  return{title:p.getProperty('LOGIN_TITLE')||'돈워리!',subtitle:p.getProperty('LOGIN_SUBTITLE')||'우리 반 경제를 함께 운영해요',logoType:p.getProperty('LOGIN_LOGO_TYPE')||'default',emoji:p.getProperty('LOGIN_EMOJI')||'',logoUrl:p.getProperty('LOGIN_LOGO_URL')||'',theme:p.getProperty('APP_THEME')||'donworry',iconColor:p.getProperty('APP_ICON')||'theme'};
 }
 function saveLoginSettings(settings){
   const p=_props();
-  p.setProperty('LOGIN_TITLE',settings.title||'교실 경제 시스템');p.setProperty('LOGIN_SUBTITLE',settings.subtitle||'우리 반 경제를 함께 운영해요');p.setProperty('LOGIN_LOGO_TYPE',settings.logoType||'default');p.setProperty('LOGIN_EMOJI',settings.emoji||'');p.setProperty('LOGIN_LOGO_URL',settings.logoUrl||'');p.setProperty('APP_THEME',settings.theme||'blue');p.setProperty('APP_ICON',settings.iconColor||'theme');
+  p.setProperty('LOGIN_TITLE',settings.title||'돈워리!');p.setProperty('LOGIN_SUBTITLE',settings.subtitle||'우리 반 경제를 함께 운영해요');p.setProperty('LOGIN_LOGO_TYPE',settings.logoType||'default');p.setProperty('LOGIN_EMOJI',settings.emoji||'');p.setProperty('LOGIN_LOGO_URL',settings.logoUrl||'');p.setProperty('APP_THEME',settings.theme||'donworry');p.setProperty('APP_ICON',settings.iconColor||'theme');
   return{ok:true};
 }
 

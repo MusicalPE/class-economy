@@ -1,3 +1,55 @@
+/* 돈워리! 로고 — 칠판 안의 웃는 동전.
+   아이콘(assets/icon.svg)에서 네이비 바탕만 뺀 모양입니다.
+   어두운 배경 위에 얹히므로 바탕 없이 그립니다. */
+var DW_MARK =
+  '<svg viewBox="36 86 440 342" xmlns="http://www.w3.org/2000/svg" aria-label="돈워리!">' +
+  '<rect x="46" y="96" width="420" height="288" rx="22" fill="#2F5D4E" stroke="#E9C27E" stroke-width="20"/>' +
+  '<rect x="112" y="392" width="288" height="26" rx="13" fill="#E9C27E"/>' +
+  '<rect x="146" y="398" width="48" height="14" rx="7" fill="#FFFFFF"/>' +
+  '<circle cx="256" cy="240" r="100" fill="#F6C457"/>' +
+  '<circle cx="256" cy="240" r="100" fill="none" stroke="#D08C1C" stroke-width="16"/>' +
+  '<circle cx="256" cy="240" r="75" fill="none" stroke="#D08C1C" stroke-width="9" opacity=".45"/>' +
+  '<circle cx="227" cy="222" r="11" fill="#1B3B30"/>' +
+  '<circle cx="285" cy="222" r="11" fill="#1B3B30"/>' +
+  '<path d="M220 266c10 23 27 35 36 35s26-12 36-35" fill="none" stroke="#1B3B30"' +
+  ' stroke-width="15" stroke-linecap="round"/>' +
+  '</svg>';
+
+/* 화면 설정의 미리보기에 쓰는 작은 판 */
+var DW_MARK_SM = DW_MARK.replace('<svg ', '<svg style="width:56px;height:56px;display:block;margin:0 auto 6px" ');
+
+/* 아직 초기 비밀번호(1234)를 쓰고 있을 때 띄우는 알림.
+   누구나 들어올 수 있는 상태라 그냥 지나치지 않게 위쪽에 붙여 둡니다. */
+function showDefaultPwNotice() {
+  if (document.getElementById('dw-pw-notice')) return;
+
+  var bar = document.createElement('div');
+  bar.id = 'dw-pw-notice';
+
+  var txt = document.createElement('div');
+  txt.className = 'dw-pw-txt';
+  txt.innerHTML = '<strong>아직 초기 비밀번호(1234)를 쓰고 있습니다.</strong>' +
+                  '<span>주소를 아는 사람은 누구나 관리자로 들어올 수 있습니다. 비밀번호를 바꿔 주세요.</span>';
+
+  var go = document.createElement('button');
+  go.className = 'dw-pw-go';
+  go.textContent = '바꾸러 가기';
+  go.onclick = function () {
+    try { showPage('passwords'); } catch (e) {}
+    bar.remove();
+  };
+
+  var later = document.createElement('button');
+  later.className = 'dw-pw-later';
+  later.textContent = '나중에';
+  later.onclick = function () { bar.remove(); };
+
+  bar.appendChild(txt);
+  bar.appendChild(go);
+  bar.appendChild(later);
+  document.body.appendChild(bar);
+}
+
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _regenerator() { var e, t, r = "function" == typeof Symbol ? Symbol : {}, n = r.iterator || "@@iterator", o = r.toStringTag || "@@toStringTag"; function i(r, n, o, i) { var c = n && n.prototype instanceof Generator ? n : Generator, u = Object.create(c.prototype); return _regeneratorDefine2(u, "_invoke", function (r, n, o) { var i, c, u, f = 0, p = o || [], y = !1, G = { p: 0, n: 0, v: e, a: d, f: d.bind(e, 4), d: function d(t, r) { return i = t, c = 0, u = e, G.n = r, a; } }; function d(r, n) { for (c = r, u = n, t = 0; !y && f && !o && t < p.length; t++) { var o, i = p[t], d = G.p, l = i[2]; r > 3 ? (o = l === n) && (u = i[(c = i[4]) ? 5 : (c = 3, 3)], i[4] = i[5] = e) : i[0] <= d && ((o = r < 2 && d < i[1]) ? (c = 0, G.v = n, G.n = i[1]) : d < l && (o = r < 3 || i[0] > n || n > l) && (i[4] = r, i[5] = n, G.n = l, c = 0)); } if (o || r > 1) return a; throw y = !0, n; } return function (o, p, l) { if (f > 1) throw TypeError("Generator is already running"); for (y && 1 === p && d(p, l), c = p, u = l; (t = c < 2 ? e : u) || !y;) { i || (c ? c < 3 ? (c > 1 && (G.n = -1), d(c, u)) : G.n = u : G.v = u); try { if (f = 2, i) { if (c || (o = "next"), t = i[o]) { if (!(t = t.call(i, u))) throw TypeError("iterator result is not an object"); if (!t.done) return t; u = t.value, c < 2 && (c = 0); } else 1 === c && (t = i.return) && t.call(i), c < 2 && (u = TypeError("The iterator does not provide a '" + o + "' method"), c = 1); i = e; } else if ((t = (y = G.n < 0) ? u : r.call(n, G)) !== a) break; } catch (t) { i = e, c = 1, u = t; } finally { f = 1; } } return { value: t, done: y }; }; }(r, o, i), !0), u; } var a = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} t = Object.getPrototypeOf; var c = [][n] ? t(t([][n]())) : (_regeneratorDefine2(t = {}, n, function () { return this; }), t), u = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(c); function f(e) { return Object.setPrototypeOf ? Object.setPrototypeOf(e, GeneratorFunctionPrototype) : (e.__proto__ = GeneratorFunctionPrototype, _regeneratorDefine2(e, o, "GeneratorFunction")), e.prototype = Object.create(u), e; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, _regeneratorDefine2(u, "constructor", GeneratorFunctionPrototype), _regeneratorDefine2(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = "GeneratorFunction", _regeneratorDefine2(GeneratorFunctionPrototype, o, "GeneratorFunction"), _regeneratorDefine2(u), _regeneratorDefine2(u, o, "Generator"), _regeneratorDefine2(u, n, function () { return this; }), _regeneratorDefine2(u, "toString", function () { return "[object Generator]"; }), (_regenerator = function _regenerator() { return { w: i, m: f }; })(); }
 function _regeneratorDefine2(e, r, n, t) { var i = Object.defineProperty; try { i({}, "", {}); } catch (e) { i = 0; } _regeneratorDefine2 = function _regeneratorDefine(e, r, n, t) { function o(r, n) { _regeneratorDefine2(e, r, function (e) { return this._invoke(r, n, e); }); } r ? i ? i(e, r, { value: n, enumerable: !t, configurable: !t, writable: !t }) : e[r] = n : (o("next", 0), o("throw", 1), o("return", 2)); }, _regeneratorDefine2(e, r, n, t); }
@@ -249,6 +301,7 @@ function _doAdminLogin() {
         case 3:
           res = _context3.v;
           if (res.ok) {
+            if (res.isDefault) { try { setTimeout(showDefaultPwNotice, 400); } catch (e) {} }
             _context3.n = 4;
             break;
           }
@@ -3073,13 +3126,13 @@ function convertGDriveUrl(url) {
 }
 function applyLoginSettings(s) {
   if (!s) return;
-  document.getElementById('login-title-text').textContent = s.title || '교실 경제 시스템';
+  document.getElementById('login-title-text').textContent = s.title || '돈워리!';
   document.getElementById('login-subtitle-text').textContent = s.subtitle || '우리 반 경제를 함께 운영해요';
   var titleEls = [document.getElementById('app-title-admin'), document.getElementById('app-title-student')];
   titleEls.forEach(function (el) {
-    if (el) el.textContent = s.title || '교실 경제 시스템';
+    if (el) el.textContent = s.title || '돈워리!';
   });
-  document.title = s.title || '교실 경제 시스템';
+  document.title = s.title || '돈워리!';
   var wrap = document.getElementById('login-logo-icon-wrap');
   if (s.logoType === 'url' && s.logoUrl) {
     var url = convertGDriveUrl(s.logoUrl);
@@ -3092,7 +3145,7 @@ function applyLoginSettings(s) {
   } else if (s.logoType === 'emoji' && s.emoji) {
     wrap.innerHTML = "<span style=\"font-size:54px;display:block;margin-bottom:8px;line-height:1\">".concat(s.emoji, "</span>");
   } else {
-    wrap.innerHTML = "<i class=\"ti ti-building-bank\" style=\"font-size:48px;display:block;margin-bottom:8px;opacity:.9\"></i>";
+    wrap.innerHTML = DW_MARK;
   }
   if (s.theme) { try { applyTheme(s.theme); } catch (e) {} }
   try { applyIconColor(s.iconColor || 'theme'); } catch (e) {}
@@ -3128,7 +3181,7 @@ function pickEmoji(e) {
 }
 function updateSettingsPreview() {
   var _document$querySelect2;
-  var title = document.getElementById('cfg-title').value || '교실 경제 시스템';
+  var title = document.getElementById('cfg-title').value || '돈워리!';
   var subtitle = document.getElementById('cfg-subtitle').value || '우리 반 경제를 함께 운영해요';
   var type = ((_document$querySelect2 = document.querySelector('input[name="cfg-logo-type"]:checked')) === null || _document$querySelect2 === void 0 ? void 0 : _document$querySelect2.value) || 'default';
   var emoji = document.getElementById('cfg-emoji').value;
@@ -3147,7 +3200,7 @@ function updateSettingsPreview() {
   } else if (type === 'emoji' && emoji) {
     pw.innerHTML = "<span style=\"font-size:44px;display:block;margin-bottom:6px;line-height:1\">".concat(emoji, "</span>");
   } else {
-    pw.innerHTML = "<i class=\"ti ti-building-bank\" style=\"font-size:40px;opacity:.9\"></i>";
+    pw.innerHTML = DW_MARK_SM;
   }
 }
 function doSaveSettings() {
@@ -3161,7 +3214,7 @@ function _doSaveSettings() {
       while (1) switch (_context42.p = _context42.n) {
         case 0:
           settings = {
-            title: document.getElementById('cfg-title').value.trim() || '교실 경제 시스템',
+            title: document.getElementById('cfg-title').value.trim() || '돈워리!',
             subtitle: document.getElementById('cfg-subtitle').value.trim() || '우리 반 경제를 함께 운영해요',
             logoType: ((_document$querySelect3 = document.querySelector('input[name="cfg-logo-type"]:checked')) === null || _document$querySelect3 === void 0 ? void 0 : _document$querySelect3.value) || 'default',
             emoji: document.getElementById('cfg-emoji').value.trim(),
@@ -3214,7 +3267,7 @@ function _doResetSettings() {
           defaults = {
             theme: 'blue',
             iconColor: 'theme',
-            title: '교실 경제 시스템',
+            title: '돈워리!',
             subtitle: '우리 반 경제를 함께 운영해요',
             logoType: 'default',
             emoji: '',
@@ -3934,6 +3987,7 @@ function doRepairMonths() {
 //  테마 색상
 // ══════════════════════════════════════════════
 var THEMES = {
+  donworry: { name: '돈워리 기본', c1: '#1F3A5F', c1d: '#142942', c1l: '#e8edf5', g1: '#15283F', g2: '#1F3A5F', g3: '#2E5D4E' },
   blue:   { name: '기본 파랑', c1: '#1a56db', c1d: '#1340a8', c1l: '#e8f0fe', g1: '#1340a8', g2: '#1a56db', g3: '#3b82f6' },
   green:  { name: '숲 초록',   c1: '#0e9f6e', c1d: '#057a53', c1l: '#def7ec', g1: '#057a53', g2: '#0e9f6e', g3: '#34d399' },
   purple: { name: '보라',      c1: '#7c3aed', c1d: '#5b21b6', c1l: '#ede9fe', g1: '#5b21b6', g2: '#7c3aed', g3: '#a78bfa' },
@@ -3945,18 +3999,22 @@ var THEMES = {
 };
 
 function applyTheme(key) {
-  var t = THEMES[key] || THEMES.blue;
+  var t = THEMES[key] || THEMES.donworry;
   var r = document.documentElement;
   r.style.setProperty('--c1', t.c1);
   r.style.setProperty('--c1d', t.c1d);
   r.style.setProperty('--c1l', t.c1l);
+  // 위쪽에서 은은하게 비치는 금빛. 어느 테마를 골라도 같이 따라붙습니다.
+  var glow = 'radial-gradient(900px 460px at 50% -8%, rgba(246,196,87,.18), transparent 62%),';
   var login = document.getElementById('login-screen');
   if (login) {
-    login.style.background = 'linear-gradient(135deg,' + t.g1 + ' 0%,' + t.g2 + ' 50%,' + t.g3 + ' 100%)';
+    login.style.background = glow +
+      'linear-gradient(135deg,' + t.g1 + ' 0%,' + t.g2 + ' 52%,' + t.g3 + ' 100%)';
   }
   var pv = document.getElementById('preview-bg');
   if (pv) {
-    pv.style.background = 'linear-gradient(135deg,' + t.g1 + ' 0%,' + t.g2 + ' 55%,' + t.g3 + ' 100%)';
+    pv.style.background = glow +
+      'linear-gradient(135deg,' + t.g1 + ' 0%,' + t.g2 + ' 55%,' + t.g3 + ' 100%)';
   }
   var prof = document.querySelector('.profile-card');
   if (prof) {
@@ -3996,7 +4054,7 @@ function pickTheme(key) {
   loading(true, '테마 저장 중...');
   var s = S.loginSettings || {};
   call('saveLoginSettings', {
-    title: s.title || '교실 경제 시스템',
+    title: s.title || '돈워리!',
     subtitle: s.subtitle || '우리 반 경제를 함께 운영해요',
     logoType: s.logoType || 'default',
     emoji: s.emoji || '',
@@ -4499,7 +4557,7 @@ function pickIconColor(key) {
   loading(true, '저장 중...');
   var s = S.loginSettings || {};
   call('saveLoginSettings', {
-    title: s.title || '교실 경제 시스템',
+    title: s.title || '돈워리!',
     subtitle: s.subtitle || '우리 반 경제를 함께 운영해요',
     logoType: s.logoType || 'default',
     emoji: s.emoji || '',

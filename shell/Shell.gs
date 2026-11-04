@@ -1,5 +1,5 @@
 /* ──────────────────────────────────────────────────────────────
-   교실 경제 시스템 — 껍데기 (Shell.gs)
+   돈워리! — 껍데기 (Shell.gs)
 
    이 파일은 고칠 일이 없습니다.
    실제 기능은 라이브러리(CE)에 들어 있고, 선생님의 자료는
@@ -36,7 +36,7 @@ function processMatureSavings() {
 
 function onOpen() {
   SpreadsheetApp.getUi()
-    .createMenu('교실 경제')
+    .createMenu('돈워리!')
     .addItem('접속 주소 보기', 'ce_showUrl')
     .addItem('자동 처리 켜기', 'ce_initTriggers')
     .addSeparator()
@@ -52,7 +52,7 @@ function ce_showUrl() {
     return;
   }
   ui.alert('학생들에게 알려 줄 주소입니다.\n\n' + url +
-           '\n\n이 주소로 들어오면 교실 경제 시스템 화면이 열립니다.');
+           '\n\n이 주소로 들어오면 돈워리! 화면이 열립니다.');
 }
 
 function ce_initTriggers() {
