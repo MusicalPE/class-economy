@@ -10,6 +10,10 @@
 
   var KEY = 'CE_API_URL';
 
+  /* ?demo 로 들어오면 학교 시트 없이 지어낸 학급으로 둘러봅니다 (js/demo.js) */
+  var DEMO = /[?&]demo(=|&|$)/.test(location.search);
+  window.CE_DEMO = DEMO;
+
   function qs(name) {
     var m = new RegExp('[?&]' + name + '=([^&]*)').exec(location.search);
     return m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : '';
@@ -17,7 +21,7 @@
 
   /* ?app=<웹앱주소> 로 들어오면 저장해 두고 주소창에서는 지운다.
      한 번 들어온 기기는 다음부터 주소 없이 들어와도 된다. */
-  var fromUrl = qs('app');
+  var fromUrl = DEMO ? '' : qs('app');
   if (fromUrl) {
     try { localStorage.setItem(KEY, fromUrl); } catch (e) {}
     try { history.replaceState(null, '', location.pathname); } catch (e) {}
@@ -44,8 +48,23 @@
      application/json 으로 보내면 브라우저가 먼저 OPTIONS 요청을
      보내는데, Apps Script 웹앱은 그 요청에 답하지 못해 실패합니다.
      ────────────────────────────────────────────────────────── */
+  var demoLoad = null;
+  function demoCall(fn, args) {
+    if (!demoLoad) {
+      demoLoad = new Promise(function (res, rej) {
+        var sc = document.createElement('script');
+        sc.src = 'js/demo.js?v=2.1.0';
+        sc.onload = res;
+        sc.onerror = function () { rej(new Error('미리보기를 불러오지 못했어요.')); };
+        document.head.appendChild(sc);
+      });
+    }
+    return demoLoad.then(function () { return window.CE_demoCall(fn, args); });
+  }
+
   window.call = function (fn) {
     var args = Array.prototype.slice.call(arguments, 1);
+    if (DEMO) return demoCall(fn, args);
     var url = getUrl();
 
     if (!url) {
@@ -227,8 +246,66 @@
     setInterval(placeChip, 1500);
   }
 
+  /* ── 미리보기 안내 ─────────────────────────────────────────── */
+  if (DEMO) {
+    // 미리보기 로그인이 진짜 학급 접속에 섞이지 않도록 이 창의 로그인 기억은 지웁니다.
+    try { sessionStorage.removeItem('cls_session'); } catch (e) {}
+    window.addEventListener('pagehide', function () {
+      try { sessionStorage.removeItem('cls_session'); } catch (e) {}
+    });
+    var who = (/[?&]demo=([a-z]+)/.exec(location.search) || [])[1] || '';
+    var startDemo = function () {
+      var st = document.createElement('style');
+      st.textContent =
+        '.ce-demo-note{background:#FFF4D6;color:#6B4E0E;border-radius:10px;padding:10px 12px;' +
+        'font-size:13px;line-height:1.6;margin:0 0 14px;text-align:left}' +
+        '.ce-demo-note b{color:#4A3608}' +
+        '.ce-demo-tag{position:fixed;left:50%;transform:translateX(-50%);' +
+        'bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:9000;background:#2F5D4E;color:#fff;' +
+        'border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;opacity:.92;pointer-events:none}';
+      document.head.appendChild(st);
+      var card = document.querySelector('#login-screen .login-card');
+      if (card) {
+        var n = document.createElement('div');
+        n.className = 'ce-demo-note';
+        n.innerHTML = '<b>미리보기 화면이에요.</b> 지어낸 우리 반이라 아무 비밀번호나 넣으면 들어가요. ' +
+          '바꾼 내용은 저장되지 않고 새로고침하면 처음으로 돌아가요.';
+        card.insertBefore(n, card.firstChild);
+      }
+      var tag = document.createElement('div');
+      tag.className = 'ce-demo-tag';
+      tag.textContent = '미리보기 · 지어낸 학급';
+      document.body.appendChild(tag);
+
+      // ?demo=teacher, ?demo=student 로 들어오면 바로 그 화면으로
+      if (who === 'teacher') {
+        var a = document.getElementById('admin-pw');
+        if (a && window.doAdminLogin) {
+          try { switchLoginTab('teacher'); } catch (e) {}
+          a.value = 'demo';
+          window.doAdminLogin();
+        }
+      } else if (who === 'student') {
+        var tries = 0;
+        var t = setInterval(function () {
+          var sel = document.getElementById('login-num');
+          tries++;
+          if (sel && sel.querySelector('option[value="4"]')) {
+            clearInterval(t);
+            sel.value = '4';
+            try { onSelectStudent(); } catch (e) {}
+            document.getElementById('login-pw').value = 'demo';
+            window.doStudentLogin();
+          } else if (tries > 60) clearInterval(t);
+        }, 150);
+      }
+    };
+    if (document.readyState === 'complete') setTimeout(startDemo, 0);
+    else window.addEventListener('load', function () { setTimeout(startDemo, 0); });
+  }
+
   /* 주소가 없으면 화면이 뜨기 전에 먼저 막는다 */
-  if (!getUrl()) {
+  if (!DEMO && !getUrl()) {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', showSetup);
     } else {

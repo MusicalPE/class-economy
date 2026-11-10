@@ -31,6 +31,17 @@ shell/Shell.gs      각 학교 시트에 붙는 껍데기
 shell/appsscript.json
 ```
 
+## 미리보기
+
+학교 시트 없이 지어낸 학급으로 둘러볼 수 있어요. 바꾼 내용은 저장되지 않고 새로고침하면 처음으로 돌아갑니다.
+
+- 첫 화면: https://musicalpe.github.io/class-economy/?demo
+- 선생님 화면: https://musicalpe.github.io/class-economy/?demo=teacher
+- 학생 화면: https://musicalpe.github.io/class-economy/?demo=student
+
+`js/demo.js` 가 `gas/Code.gs` 를 브라우저에서 그대로 돌리고, 스프레드시트 대신 메모리 속 표를 씁니다.
+서버를 고치면 미리보기도 함께 바뀝니다.
+
 ## 화면을 고쳤을 때
 
 GitHub에 올리면 모든 학교에 바로 적용됩니다. 따로 할 일이 없습니다.
