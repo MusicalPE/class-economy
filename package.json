@@ -1,0 +1,12 @@
+{
+  "name": "class-economy",
+  "private": true,
+  "description": "돈워리! 교실 경제 — 올리기 전 검사용 도구만 들어 있습니다. 프로그램 자체는 설치가 필요 없습니다.",
+  "type": "module",
+  "scripts": {
+    "test": "node test/run.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.0"
+  }
+}
