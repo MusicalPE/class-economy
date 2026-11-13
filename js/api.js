@@ -53,7 +53,7 @@
     if (!demoLoad) {
       demoLoad = new Promise(function (res, rej) {
         var sc = document.createElement('script');
-        sc.src = 'js/demo.js?v=2.1.0';
+        sc.src = 'js/demo.js?v=2.2.0';
         sc.onload = res;
         sc.onerror = function () { rej(new Error('미리보기를 불러오지 못했어요.')); };
         document.head.appendChild(sc);

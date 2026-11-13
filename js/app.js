@@ -303,6 +303,7 @@ function _doAdminLogin() {
           res = _context3.v;
           if (res.ok) {
             if (res.isDefault) { try { setTimeout(showDefaultPwNotice, 400); } catch (e) {} }
+            try { setTimeout(function () { if (window.dwCheckServer) dwCheckServer(); }, 900); } catch (e) {}
             _context3.n = 4;
             break;
           }
@@ -4054,6 +4055,12 @@ function tickClock() {
   // 사이드바 아래 날짜
   var c = document.getElementById('sidebar-today');
   if (c) c.textContent = (d.getMonth() + 1) + '월 ' + d.getDate() + '일 (' + days[d.getDay()] + ')';
+
+  // 새로고침으로 선생님 화면에 바로 들어온 경우에도 판을 확인합니다.
+  try {
+    var adm = document.getElementById('admin-screen');
+    if (adm && adm.classList.contains('show') && window.dwCheckServer) dwCheckServer();
+  } catch (e) {}
 
   // 로고는 한 번만 그려 넣습니다. (교사 사이드바 / 학생 상단바)
   ['sidebar-mark', 'student-mark'].forEach(function (id) {

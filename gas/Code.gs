@@ -20,7 +20,7 @@ const SHEET_NAMES = {
   SETTINGS   : '설정'
 };
 
-const APP_VERSION = '2.1.0';
+const APP_VERSION = '2.2.0';
 
 // 화면이 올라가 있는 주소 (GitHub Pages)
 const APP_URL = 'https://musicalpe.github.io/class-economy/';
@@ -107,6 +107,7 @@ function doGet(e, selfUrl) {
 function _apiTable() {
   return {
     ping: function () { return { ok: true, version: APP_VERSION }; },
+    getServerInfo: getServerInfo,
     adjustBalance: adjustBalance,
     applyTax: applyTax,
     approveSaving: approveSaving,
@@ -173,6 +174,14 @@ function _apiTable() {
     verifyAdminLogin: verifyAdminLogin,
     verifyStudentLogin: verifyStudentLogin
   };
+}
+
+/* 선생님 화면의 '연결 정보'에 쓰입니다.
+   지금 돌고 있는 라이브러리 판과, 이 학급 스프레드시트 주소를 알려 줍니다. */
+function getServerInfo() {
+  let url = '';
+  try { url = SpreadsheetApp.getActiveSpreadsheet().getUrl(); } catch (err) {}
+  return { ok: true, version: APP_VERSION, sheetUrl: String(url || '') };
 }
 
 function doPost(e) {

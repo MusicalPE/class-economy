@@ -11,7 +11,7 @@
    주소가 달라(cross-origin) 여기를 거치지 않습니다.
    ────────────────────────────────────────────────────────────── */
 
-var VERSION = '2.1.0';
+var VERSION = '2.2.0';
 var CACHE = 'donworry-' + VERSION;
 
 var SHELL = [
@@ -20,6 +20,7 @@ var SHELL = [
   './css/style.css',
   './js/api.js',
   './js/app.js',
+  './js/update.js',
   './manifest.webmanifest',
   './assets/favicon.svg',
   './assets/icon-192.png',

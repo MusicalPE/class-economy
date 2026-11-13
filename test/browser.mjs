@@ -10,7 +10,7 @@
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
-import { reply } from './mock.mjs';
+import { reply, state } from './mock.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const API = 'https://script.google.com/macros/s/TEST/exec';
@@ -44,9 +44,10 @@ export async function runBrowser() {
   const browser = await chromium.launch(opts);
 
   /* 화면 하나를 새로 엽니다. calls 에 서버로 간 요청이 쌓입니다. */
-  async function open({ linked = true, width = 1366, query = '' } = {}) {
-    const ctx = await browser.newContext({ viewport: { width, height: 900 },
-                                           serviceWorkers: 'block' });
+  async function open({ linked = true, width = 1366, query = '', phone = false } = {}) {
+    const ctxOpts = { viewport: { width, height: 900 }, serviceWorkers: 'block' };
+    if (phone) ctxOpts.userAgent = 'Mozilla/5.0 (Linux; Android 14; SM-S921N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36';
+    const ctx = await browser.newContext(ctxOpts);
     const page = await ctx.newPage();
     const calls = [], errors = [];
     page.on('pageerror', e => errors.push(e.message));
@@ -56,9 +57,12 @@ export async function runBrowser() {
       if (url === API) {
         const body = JSON.parse(route.request().postData() || '{}');
         calls.push(body);
+        let payload;
+        try { payload = { __r: reply(body.fn, body.args || []) }; }
+        catch (e) { payload = { __error: e.message }; }
         return route.fulfill({ status: 200, contentType: 'application/json',
           headers: { 'Access-Control-Allow-Origin': '*' },
-          body: JSON.stringify({ __r: reply(body.fn, body.args || []) }) });
+          body: JSON.stringify(payload) });
       }
       if (url.startsWith(BASE)) return route.continue();
       return route.abort();          // 글꼴·아이콘 같은 바깥 자원은 받지 않습니다
@@ -239,6 +243,101 @@ export async function runBrowser() {
       await ctx.close();
     }
 
+    /* ── 6-2. 라이브러리 판 확인 · 새 판으로 바꾸는 법 ───────── */
+    async function teacher(o) {
+      const t = await open(o);
+      await t.page.click('.login-tab:last-child');
+      await t.page.fill('#admin-pw', '1234');
+      await t.page.click('#form-teacher .login-btn');
+      await t.page.waitForTimeout(2600);
+      return t;
+    }
+    const LATEST = (fs.readFileSync(path.join(ROOT, 'js/update.js'), 'utf8')
+                     .match(/DW_SERVER_LATEST\s*=\s*'([\d.]+)'/) || [])[1];
+    {
+      // 예전 판 서버
+      state.version = '2.0.0'; state.hasInfo = true;
+      const { ctx, page, errors } = await teacher();
+      add('판 확인: 예전 판이면 대시보드에 알림 줄', await shown(page, '#dw-old-line'));
+      await page.evaluate(() => showPage('settings'));
+      await page.waitForTimeout(300);
+      const info = await page.textContent('#conn-info');
+      add('판 확인: 연결 정보에 "2.0.0판 · 새 판 있음"', info.includes('2.0.0판') && info.includes('새 판 있음'), info.trim().slice(0, 60));
+      add('판 확인: 연결 정보에 내 시트 링크',
+          (await page.getAttribute('#conn-info a', 'href')) === 'https://docs.google.com/spreadsheets/d/TEST/edit');
+
+      // 다른 창(급여 창)이 열린 채로 안내 창을 띄운다
+      await page.evaluate(() => openSalaryModal());
+      await page.waitForTimeout(700);
+      await page.evaluate(() => openUpdateGuide());
+      await page.waitForTimeout(200);
+      add('안내 창: 열린다', await shown(page, '#dw-guide .dw-guide-box'));
+      add('안내 창: 다른 창 위에 겹쳐 뜬다', await page.evaluate(() => {
+        const g = document.querySelector('#dw-guide .dw-guide-box').getBoundingClientRect();
+        const top = document.elementFromPoint(g.left + g.width / 2, g.top + 30);
+        return !!top && !!top.closest('#dw-guide') &&
+               document.getElementById('modal-salary').classList.contains('open');
+      }));
+      const steps = await page.$$eval('#dw-guide .dw-guide-steps li', l => l.map(x => x.textContent));
+      add('안내 창: 3단계', steps.length === 3, steps.length + '단계');
+      add('안내 창: 시트 → Apps Script', steps[0] && steps[0].includes('Apps Script'));
+      add('안내 창: 라이브러리 CE 버전 올리기', steps[1] && steps[1].includes('CE') && steps[1].includes('가장 높은 숫자'));
+      add('안내 창: 배포 관리 → 새 버전, 주소 그대로',
+          steps[2] && steps[2].includes('배포 관리') && steps[2].includes('새 버전') && steps[2].includes('주소는 그대로'));
+      add('안내 창: 1단계에 내 시트 링크',
+          (await page.getAttribute('#dw-guide .dw-guide-steps a', 'href')) === 'https://docs.google.com/spreadsheets/d/TEST/edit');
+      const body = await page.textContent('#dw-guide');
+      add('안내 창: 컴퓨터에서 하라는 안내', body.includes('컴퓨터에서 해 주세요'));
+      add('안내 창: 새로고침 안내', body.includes('새로고침하면 새 판이 적용돼요'));
+      add('안내 창: 컴퓨터에서는 휴대폰 문구가 없다', !(await page.$('#dw-guide-phone')));
+      add('안내 창: 사본을 새로 받으라는 말이 없다', !/사본/.test(body));
+      await page.evaluate(() => closeUpdateGuide());
+      add('안내 창: 닫으면 급여 창은 그대로', !(await page.$('#dw-guide')) &&
+          await page.evaluate(() => document.getElementById('modal-salary').classList.contains('open')));
+      add('판 확인(예전 판): 오류 없음', errors.length === 0, errors.slice(0, 2).join(' / '));
+      await ctx.close();
+    }
+    {
+      // getServerInfo 가 아예 없는 더 옛 서버
+      state.version = '2.0.0'; state.hasInfo = false;
+      const { ctx, page, errors } = await teacher();
+      add('옛 서버: 그래도 알림 줄이 뜬다', await shown(page, '#dw-old-line'));
+      await page.evaluate(() => openUpdateGuide());
+      const li = await page.textContent('#dw-guide .dw-guide-steps li');
+      add('옛 서버: 시트 주소를 몰라도 안내가 나온다', li.includes('스프레드시트 열기') && !(await page.$('#dw-guide .dw-guide-steps a')));
+      add('옛 서버: 오류 없음', errors.length === 0, errors.slice(0, 2).join(' / '));
+      await ctx.close();
+    }
+    {
+      // 최신 판 서버
+      state.version = LATEST; state.hasInfo = true;
+      const { ctx, page, errors } = await teacher();
+      add('최신 판: 알림 줄이 없다', !(await shown(page, '#dw-old-line')));
+      await page.evaluate(() => showPage('settings'));
+      await page.waitForTimeout(300);
+      const info = await page.textContent('#conn-info');
+      add('최신 판: "최신 판이에요", 단추 없음', info.includes('최신 판이에요') && !info.includes('새 판 있음') &&
+          !(await page.$('#conn-info button')));
+      add('최신 판: 오류 없음', errors.length === 0, errors.slice(0, 2).join(' / '));
+      await ctx.close();
+    }
+    {
+      // 휴대폰
+      state.version = '2.0.0'; state.hasInfo = true;
+      const { ctx, page, errors } = await teacher({ width: 412, phone: true });
+      await page.evaluate(() => openUpdateGuide());
+      const phone = await page.$('#dw-guide-phone');
+      add('휴대폰: 컴퓨터에서 열라는 한 줄이 더 나온다',
+          phone && (await phone.textContent()).includes('컴퓨터에서 선생님 화면을 열고'));
+      add('휴대폰: 안내 창이 화면 안에 들어온다', await page.evaluate(() => {
+        const r = document.querySelector('.dw-guide-box').getBoundingClientRect();
+        return r.left >= 0 && r.right <= window.innerWidth + 1;
+      }));
+      add('휴대폰(안내 창): 오류 없음', errors.length === 0, errors.slice(0, 2).join(' / '));
+      await ctx.close();
+    }
+    state.version = '2.0.0'; state.hasInfo = true;
+
     /* ── 7. 미리보기 (?demo) ────────────────────────────────
        학교 시트 없이 gas/Code.gs 를 브라우저에서 그대로 돌리는 화면입니다.
        서버 계산이 실제로 도는 자리라, 서버를 고쳤을 때 여기서 걸립니다. */
@@ -281,6 +380,7 @@ export async function runBrowser() {
       add('미리보기(교사): 보너스 100원 → 금고 100원 감소', before - after === 100, before + ' → ' + after);
       add('미리보기(교사): 보너스 100원 → 학생 잔액 100원 증가', balAfter - who.bal === 100,
           who.bal + ' → ' + balAfter);
+      add('미리보기(교사): 예전 판 알림이 뜨지 않는다', !(await shown(page, '#dw-old-line')));
       add('미리보기(교사): 오류 없음', errors.length === 0, errors.slice(0, 2).join(' / '));
       await ctx.close();
     }

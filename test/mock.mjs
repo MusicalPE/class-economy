@@ -85,10 +85,19 @@ export const LOAD_ALL = {
   currentPeriod: { month: 11, half: 1 }
 };
 
+/* 시험마다 바꿔 끼우는 서버 상태
+     version   : 서버(라이브러리)가 자기 판이라고 답하는 숫자
+     hasInfo   : false 면 getServerInfo 가 없는 옛 서버(2.2.0 이전)처럼 군다 */
+export const state = { version: '2.0.0', hasInfo: true };
+
 /* 함수 이름 → 돌려줄 값. 서버가 하는 일을 흉내만 냅니다. */
 export function reply(fn, args) {
   switch (fn) {
-    case 'ping':                return { ok: true, version: 'test' };
+    case 'ping':                return { ok: true, version: state.version };
+    case 'getServerInfo':
+      if (!state.hasInfo) throw new Error('허용되지 않은 요청입니다: getServerInfo');
+      return { ok: true, version: state.version,
+               sheetUrl: 'https://docs.google.com/spreadsheets/d/TEST/edit' };
     case 'getStudentsForLogin': return STUDENTS.map(s => ({ num: s.num, name: s.name }));
     case 'getLoginSettings':    return SETTINGS;
     case 'verifyStudentLogin': {

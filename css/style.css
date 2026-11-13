@@ -540,6 +540,43 @@ input[type=range].rate-slider::-webkit-slider-thumb{-webkit-appearance:none;widt
 .role-lock-notice i{font-size:14px}
 
 /* ══════════════════════════════════════════════════════════
+   연결 정보 · 예전 판 알림 · 새 판으로 바꾸는 법
+   ══════════════════════════════════════════════════════════ */
+.conn-info{font-size:12.5px;color:#475569}
+.conn-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #f1f5f9}
+.conn-row:last-child{border-bottom:none}
+.conn-row .k{width:86px;flex-shrink:0;color:#94a3b8;font-weight:800;font-size:11.5px}
+.conn-row .v{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.conn-row .v b{color:var(--text)}
+.conn-row a{color:#2563eb;font-weight:700}
+.conn-ok{color:#94a3b8;font-size:11.5px;font-weight:600}
+
+.dw-old-line{align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  background:var(--gold-l);border:1px solid #fde68a;border-radius:var(--radius-sm);
+  padding:10px 14px;margin-bottom:14px;font-size:12.5px;color:#854d0e;font-weight:600}
+.dw-old-line b{color:#78350f}
+
+/* 다른 창이 열려 있어도 그 위에 뜹니다 (.modal-bg 는 200) */
+#dw-guide{position:fixed;inset:0;z-index:400;background:rgba(2,8,23,.6);
+  display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)}
+.dw-guide-box{word-break:keep-all;background:#fff;border-radius:22px;padding:24px;width:470px;max-width:100%;
+  max-height:92vh;overflow-y:auto;box-shadow:0 24px 60px rgba(2,8,23,.35)}
+.dw-guide-title{font-size:16px;font-weight:800;letter-spacing:-.3px;margin-bottom:12px}
+.dw-guide-pc{margin-bottom:10px}
+#dw-guide-phone{margin-top:6px}
+.dw-guide-sub{font-size:12.5px;color:var(--muted);font-weight:600;margin-bottom:10px}
+.dw-guide-steps{margin:0 0 12px 0;padding-left:0;list-style:none;counter-reset:dw}
+.dw-guide-steps li{counter-increment:dw;position:relative;padding:10px 0 10px 36px;
+  border-bottom:1px solid #f1f5f9;font-size:13px;line-height:1.65;color:#334155;font-weight:500}
+.dw-guide-steps li:last-child{border-bottom:none}
+.dw-guide-steps li::before{content:counter(dw);position:absolute;left:0;top:10px;
+  width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;
+  font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.dw-guide-steps a{color:#2563eb;font-weight:800}
+.dw-guide-tip{font-size:12px;color:var(--muted);margin-top:3px}
+.dw-guide-end{font-size:12.5px;font-weight:700;color:var(--board)}
+
+/* ══════════════════════════════════════════════════════════
    Made by 배지
    ══════════════════════════════════════════════════════════ */
 #made-by{position:fixed;right:18px;bottom:18px;z-index:150;background:var(--navy);

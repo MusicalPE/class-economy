@@ -21,13 +21,13 @@ export function runStatic() {
 
   const html = read('index.html');
   const app = read('js/app.js');
-  const api = read('js/api.js');
+  const api = read('js/api.js') + '\n' + read('js/update.js');
   const gs = read('gas/Code.gs');
   const shell = read('shell/Shell.gs');
 
   // 1. 문법
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'dw-'));
-  for (const [label, src] of [['js/app.js', app], ['js/api.js', api], ['sw.js', read('sw.js')], ['js/demo.js', read('js/demo.js')],
+  for (const [label, src] of [['js/app.js', app], ['js/api.js', api], ['sw.js', read('sw.js')], ['js/demo.js', read('js/demo.js')], ['js/update.js', read('js/update.js')],
                               ['gas/Code.gs', gs], ['shell/Shell.gs', shell]]) {
     const f = path.join(tmp, label.replace(/[\/.]/g, '_') + '.js');
     fs.writeFileSync(f, src);
@@ -62,7 +62,7 @@ export function runStatic() {
       deadHandlers.length ? '정의 없음: ' + deadHandlers.join(', ') : '');
 
   // 4. 화면이 부르는 서버 함수 ↔ 서버 목록
-  const called = new Set([...app.matchAll(/call\('(\w+)'/g)].map(m => m[1]));
+  const called = new Set([...(app + read('js/update.js')).matchAll(/call\('(\w+)'/g)].map(m => m[1]));
   const i = gs.indexOf('function _apiTable()'), j = gs.indexOf('function doPost(e)');
   const table = new Set([...gs.slice(i, j).matchAll(/^\s{4}(\w+):/gm)].map(m => m[1]));
   const notRegistered = [...called].filter(c => !table.has(c));
@@ -93,6 +93,13 @@ export function runStatic() {
   const vSw = (read('sw.js').match(/VERSION\s*=\s*'([\d.]+)'/) || [])[1];
   add('판 번호 일치', vHtml.length === 1 && vHtml[0] === vSw,
       'index.html ' + vHtml.join('/') + ' · sw.js ' + vSw);
+
+  // 10. 화면이 '최신'이라고 알리는 판이 실제 서버 코드보다 앞서지 않는지
+  const latest = (read('js/update.js').match(/DW_SERVER_LATEST\s*=\s*'([\d.]+)'/) || [])[1];
+  const appVer = (gs.match(/APP_VERSION\s*=\s*'([\d.]+)'/) || [])[1];
+  const num = v => String(v || '0').split('.').map(Number).reduce((a, b) => a * 1000 + b, 0);
+  add('알리는 최신 판 ≤ 서버 코드 판', !!latest && num(latest) <= num(appVer),
+      '알림 ' + latest + ' · Code.gs ' + appVer);
 
   return out;
 }
