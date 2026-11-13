@@ -115,7 +115,7 @@ function openUpdateGuide() {
       '<ol class="dw-guide-steps">' +
         '<li>' + sheet + ' → [확장 프로그램] → [Apps Script]</li>' +
         '<li>왼쪽 [라이브러리]의 <b>CE</b>를 누르고, 버전을 <b>가장 높은 숫자</b>로 바꾼 뒤 [저장]</li>' +
-        '<li>[배포] → [배포 관리] → 연필 → 버전 [새 버전] → [배포]' +
+        '<li>[배포] → [배포 관리] → 연필(수정) → 버전 [새 버전] → [배포]' +
           '<div class="dw-guide-tip">주소는 그대로라 학생 주소도 그대로예요. 권한 창이 뜨면 [허용].</div></li>' +
       '</ol>' +
       '<div class="dw-guide-end">다 바꾼 뒤 이 화면을 새로고침하면 새 판이 적용돼요.</div>' +
