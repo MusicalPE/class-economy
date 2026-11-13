@@ -10,7 +10,7 @@
    이 숫자를 올리면 안 됩니다. (올리면 선생님들이 안내대로 해도
    새 판이 없어 헛걸음합니다.)
    ────────────────────────────────────────────────────────────── */
-var DW_SERVER_LATEST = '2.1.0';
+var DW_SERVER_LATEST = '2.2.0';
 
 var DW_SERVER = { checked: false, checking: false, version: '', sheetUrl: '' };
 
