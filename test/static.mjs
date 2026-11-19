@@ -21,13 +21,13 @@ export function runStatic() {
 
   const html = read('index.html');
   const app = read('js/app.js');
-  const api = read('js/api.js') + '\n' + read('js/update.js');
+  const api = read('js/api.js') + '\n' + read('js/update.js') + '\n' + read('js/help.js');
   const gs = read('gas/Code.gs');
   const shell = read('shell/Shell.gs');
 
   // 1. 문법
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'dw-'));
-  for (const [label, src] of [['js/app.js', app], ['js/api.js', api], ['sw.js', read('sw.js')], ['js/demo.js', read('js/demo.js')], ['js/update.js', read('js/update.js')],
+  for (const [label, src] of [['js/app.js', app], ['js/api.js', api], ['sw.js', read('sw.js')], ['js/demo.js', read('js/demo.js')], ['js/update.js', read('js/update.js')], ['js/help.js', read('js/help.js')],
                               ['gas/Code.gs', gs], ['shell/Shell.gs', shell]]) {
     const f = path.join(tmp, label.replace(/[\/.]/g, '_') + '.js');
     fs.writeFileSync(f, src);
@@ -100,6 +100,16 @@ export function runStatic() {
   const num = v => String(v || '0').split('.').map(Number).reduce((a, b) => a * 1000 + b, 0);
   add('알리는 최신 판 ≤ 서버 코드 판', !!latest && num(latest) <= num(appVer),
       '알림 ' + latest + ' · Code.gs ' + appVer);
+
+  // 11. 사용 안내 동그라미의 class 이름이 다른 것과 겹치지 않는지
+  const css = read('css/style.css');
+  const clash = ['q', 'help', 'mark'].filter(c => new RegExp('\\.' + c + '[\\s{.,:]').test(css) ||
+    new RegExp('class="' + c + '"').test(html + app));
+  add('사용 안내 class 이름이 겹치지 않음', clash.length === 0 && /\.dw-help-mark\{/.test(css), clash.join(', '));
+
+  // 12. 사용 안내 단추가 세 화면(로그인·학생·선생님 왼쪽 메뉴)에 모두 있는지
+  const helpBtns = (html.match(/class="dw-help-btn[^"]*" onclick="openHelp\(\)"/g) || []).length;
+  add('사용 안내 단추 3곳', helpBtns === 3 && /class="sidebar-help"/.test(html), helpBtns + '곳');
 
   return out;
 }

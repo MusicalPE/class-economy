@@ -114,6 +114,8 @@ body{font-family:'Noto Sans KR',sans-serif;color:var(--text);font-size:14px;
 #dw-pw-notice .dw-pw-later{background:rgba(255,255,255,.13);color:#fff}
 #dw-pw-notice .dw-pw-later:hover{background:rgba(255,255,255,.22)}
 @media(max-width:560px){#dw-pw-notice{left:10px;right:10px;bottom:10px}}
+/* 넓은 화면에서는 왼쪽 메뉴(사용 안내·로그아웃)를 가리지 않게 메뉴 오른쪽에서 시작 */
+@media(min-width:641px){#dw-pw-notice{left:230px}}
 
 /* ══════════════════════════════════════════════════════════
    공통 틀
@@ -634,3 +636,50 @@ input[type=range].rate-slider::-webkit-slider-thumb{-webkit-appearance:none;widt
   .main{padding:16px}
   .search-box input{width:140px}
 }
+
+/* ══════════════════════════════════════════════════════════
+   사용 안내 단추 · 창
+   ══════════════════════════════════════════════════════════ */
+.dw-help-btn{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0 6px;
+  border:0;background:none;color:var(--text);font-family:inherit;font-size:13px;font-weight:700;
+  cursor:pointer;text-decoration:none;white-space:nowrap;flex-shrink:0}
+.dw-help-btn:hover,.dw-help-btn:focus-visible{text-decoration:underline;text-underline-offset:3px}
+.dw-help-mark{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;
+  border-radius:50%;background:#0f172a;color:#fff;font-size:12.5px;font-weight:800;line-height:1;
+  text-decoration:none;flex-shrink:0}
+/* 남색 바탕(로그인·학생 위쪽 줄·선생님 왼쪽 메뉴)에서는 검은 동그라미가 묻혀서 흰 동그라미로 */
+.dw-help-btn.on-dark{color:#fff}
+.dw-help-btn.on-dark .dw-help-mark{background:#fff;color:var(--navy)}
+.login-help{position:absolute;top:10px;left:14px;z-index:2}
+.sidebar-help{flex-shrink:0;padding:2px 12px;border-top:1px solid rgba(148,163,184,.16)}
+.sidebar-help .dw-help-btn{width:100%;color:#cbd5e1}
+.sidebar-help .dw-help-btn:hover{color:#fff}
+
+#dw-help{position:fixed;inset:0;z-index:410;background:rgba(2,8,23,.55);
+  display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)}
+.dw-help-box{word-break:keep-all;background:#fff;border-radius:22px;width:520px;max-width:100%;
+  max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(2,8,23,.35)}
+.dw-help-head{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:18px 18px 12px 24px;border-bottom:1px solid #f1f5f9}
+.dw-help-title{font-size:16px;font-weight:800;letter-spacing:-.3px;color:var(--text)}
+.dw-help-x{width:44px;height:44px;border:0;background:none;border-radius:12px;cursor:pointer;
+  font-size:26px;line-height:1;color:#64748b;font-family:inherit}
+.dw-help-x:hover{background:#f1f5f9;color:var(--text)}
+.dw-help-list{list-style:none;margin:0;padding:4px 24px;overflow-y:auto;flex:1}
+.dw-help-item{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid #f1f5f9}
+.dw-help-item:last-child{border-bottom:none}
+.dw-help-no{flex-shrink:0;width:22px;height:22px;border-radius:5px;background:var(--text);color:#fff;
+  font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.dw-help-item-t{font-size:13.5px;font-weight:800;color:var(--text);margin-bottom:5px}
+.dw-help-item ul{margin:0;padding-left:16px;list-style:disc}
+.dw-help-item ul li{font-size:12.5px;line-height:1.65;color:#475569;font-weight:500}
+.dw-help-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:12px 18px 18px 24px;border-top:1px solid #f1f5f9;flex-wrap:wrap}
+.dw-help-demo{color:#2563eb;font-size:12.5px;font-weight:700;text-decoration:none;
+  min-height:44px;display:inline-flex;align-items:center}
+.dw-help-demo:hover{text-decoration:underline}
+/* 좁은 화면에서 학생 위쪽 줄이 옆으로 넘치지 않게: 시계, 더 좁으면 이름표를 접습니다
+   (이름은 바로 아래 프로필 카드에 크게 나옵니다) */
+@media(max-width:600px){.student-topbar #topbar-clock-student{display:none}}
+@media(max-width:480px){.student-topbar .user-chip{display:none}}
+@media(max-width:400px){.student-topbar{padding:0 12px}}

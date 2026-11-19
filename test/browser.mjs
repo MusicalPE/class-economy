@@ -106,6 +106,48 @@ export async function runBrowser() {
       await ctx.close();
     }
 
+    /* ── 2-2. 사용 안내 ────────────────────────────────────── */
+    const HELP_N = (fs.readFileSync(path.join(ROOT, 'js/help.js'), 'utf8')
+                     .match(/\{ t: '/g) || []).length;
+    {
+      const { ctx, page, errors } = await open();
+      add('사용 안내: 로그인 화면에 단추가 보인다', await shown(page, '#login-screen .dw-help-btn'));
+      const h = await page.$eval('#login-screen .dw-help-btn', b => b.getBoundingClientRect().height);
+      add('사용 안내: 단추 높이 44px 이상', h >= 44, h + 'px');
+      await page.click('#login-screen .dw-help-btn');
+      await page.waitForTimeout(200);
+      add('사용 안내: 창이 열린다', await shown(page, '#dw-help .dw-help-box'));
+      add('사용 안내: 제목 "돈워리! 간략 사용법"',
+          (await page.textContent('#dw-help .dw-help-title')).trim() === '돈워리! 간략 사용법');
+      const n = await page.$$eval('#dw-help .dw-help-item', x => x.length);
+      add('사용 안내: 항목 ' + HELP_N + '개', n === HELP_N && n >= 6 && n <= 9, n + '개');
+      const nb = await page.$$eval('#dw-help .dw-help-no', x => x.map(e => e.textContent).join(','));
+      add('사용 안내: 번호가 1부터 차례로', nb === Array.from({ length: n }, (_, i) => i + 1).join(','), nb);
+      const who = await page.$$eval('#dw-help .dw-help-item-t', x => x.every(e => /\((선생님|학생|학생·선생님)\)$/.test(e.textContent.trim())));
+      add('사용 안내: 제목 끝에 (선생님)·(학생)', who);
+      const demo = await page.$('#dw-help .dw-help-demo');
+      add('사용 안내: 미리보기 링크가 새 탭으로 ?demo',
+          demo && (await demo.getAttribute('target')) === '_blank' && /\?demo$/.test(await demo.getAttribute('href')));
+      const scroll = await page.evaluate(() => {
+        const b = document.querySelector('#dw-help .dw-help-box');
+        return b.getBoundingClientRect().height <= innerHeight; });
+      add('사용 안내: 창이 화면 안에 들어온다', scroll);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(150);
+      add('사용 안내: Esc로 닫힌다', !(await page.$('#dw-help')));
+      await page.click('#login-screen .dw-help-btn');
+      await page.click('#dw-help .dw-help-x');
+      add('사용 안내: 닫기 단추로 닫힌다', !(await page.$('#dw-help')));
+      await page.click('#login-screen .dw-help-btn');
+      await page.mouse.click(5, 5);
+      add('사용 안내: 바깥을 누르면 닫힌다', !(await page.$('#dw-help')));
+      await page.click('#login-screen .dw-help-btn');
+      await page.click('#dw-help .dw-help-foot .btn');
+      add('사용 안내: 확인으로 닫힌다', !(await page.$('#dw-help')));
+      add('사용 안내: 오류 없음', errors.length === 0, errors[0]);
+      await ctx.close();
+    }
+
     /* ── 3. 학생 (직업: 반장) ──────────────────────────────── */
     {
       const { ctx, page, calls, errors } = await open();
@@ -126,6 +168,12 @@ export async function runBrowser() {
       add('학생: 넓은 화면은 두 칸',
           (await page.evaluate(() => getComputedStyle(document.querySelector('.st-grid')).display)) === 'grid');
       add('학생: 로고', await page.$('#student-mark svg'));
+      add('학생: 위쪽 줄 맨 앞에 사용 안내 단추', await page.evaluate(() => {
+        const b = document.querySelector('.student-topbar .dw-help-btn');
+        return !!b && b.offsetParent !== null && b.parentElement.firstElementChild === b; }));
+      await page.click('.student-topbar .dw-help-btn');
+      add('학생: 사용 안내 창이 열린다', await shown(page, '#dw-help .dw-help-box'));
+      await page.keyboard.press('Escape');
 
       await page.fill('#sug-title', '간식 쿠폰 가격');
       await page.fill('#sug-body', '조금 내려 주세요');
@@ -155,6 +203,9 @@ export async function runBrowser() {
       await page.waitForTimeout(900);
       add('휴대폰: 한 줄로 내려간다',
           (await page.evaluate(() => getComputedStyle(document.querySelector('.st-grid')).display)) !== 'grid');
+      add('휴대폰: 사용 안내 단추가 보인다', await shown(page, '.student-topbar .dw-help-btn'));
+      add('휴대폰: 위쪽 줄이 넘치지 않는다', await page.evaluate(() => {
+        const t = document.querySelector('.student-topbar'); return t.scrollWidth <= t.clientWidth + 1; }));
       add('휴대폰: 오류 없음', errors.length === 0, errors[0]);
       await ctx.close();
     }
@@ -193,6 +244,15 @@ export async function runBrowser() {
       add('교사: 금고 잔액 298,500원',
           (await page.textContent('#dash-stats .stat.featured .stat-value')).replace(/[^\d]/g, '') === '298500');
       add('교사: 사이드바 로고', await page.$('#sidebar-mark svg'));
+      add('교사: 왼쪽 메뉴 맨 아래에 사용 안내 단추', await page.evaluate(() => {
+        const b = document.querySelector('.sidebar .sidebar-help .dw-help-btn');
+        const nav = document.querySelector('.sidebar-nav');
+        return !!b && b.offsetParent !== null &&
+               b.getBoundingClientRect().top >= nav.getBoundingClientRect().bottom - 1; }));
+      await page.click('.sidebar-help .dw-help-btn');
+      add('교사: 사용 안내 창이 열린다', await shown(page, '#dw-help .dw-help-box'));
+      await page.keyboard.press('Escape');
+      add('교사: Esc로 닫힌다', !(await page.$('#dw-help')));
       add('교사: 사이드바가 맨 위부터',
           (await page.evaluate(() => document.querySelector('.sidebar').getBoundingClientRect().top)) === 0);
 
@@ -348,6 +408,10 @@ export async function runBrowser() {
       add('미리보기: 첫 화면에 학생 목록이 뜬다', n > 0, n + '명');
       add('미리보기: 연결 안내가 뜨지 않는다', !(await page.$('#ce-setup')));
       add('미리보기: 바깥 서버로 나가지 않는다', calls.length === 0, calls.length + '건');
+      await page.click('#login-screen .dw-help-btn');
+      add('미리보기: 사용 안내가 열린다', await shown(page, '#dw-help .dw-help-box'));
+      add('미리보기: 안에서는 미리보기 링크를 숨긴다', !(await page.$('#dw-help .dw-help-demo')));
+      await page.keyboard.press('Escape');
       add('미리보기: 오류 없음', errors.length === 0, errors[0]);
       await ctx.close();
     }
